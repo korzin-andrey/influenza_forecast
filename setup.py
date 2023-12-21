@@ -10,7 +10,7 @@ setup(name='uq_influenza_modeling',
       install_requires=['dash',
                         'dash_bootstrap_components',
                         'dash_extensions',
-                        'diskcache'
+                        'diskcache',
                         'kaleido',
                         'matplotlib',
                         'numpy',
