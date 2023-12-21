@@ -11,7 +11,6 @@ Linux:
 2) ```source .env/bin/activate ```
 3) ```python -m pip install -e . ```
 4) ```python gui/app.py ```
-It will launch 
 ------------------------------------------------------------------
 Enjoy forecasting influenza outbreaks!
 
