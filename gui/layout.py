@@ -70,7 +70,7 @@ def get_mu_layout(value):
         ]),
         Col([
             dbc.Input(id='mu_io', type='number',
-                      value=value, style={'width': '170px'}, step=0.001)
+                      value=value, style={'width': '170px'}, step=0.01)
         ], align='end')
     ])
 
@@ -83,7 +83,7 @@ def get_delta_layout(value):
         ]),
         Col([
             dbc.Input(id='delta_io', type='number',
-                      value=value, style={'width': '170px'}, step=0.001)
+                      value=value, style={'width': '170px'})
         ], align='end')
     ])
 
@@ -96,7 +96,7 @@ sample = Row([
     ]),
     Col([
         dbc.Input(id='sample_io', type='number',
-                  value=52, style={'width': '170px'}, step=0.001)
+                  value=52, style={'width': '170px'})
     ], align='end')
 ])
 
@@ -108,7 +108,7 @@ forecasting = Row([
     ]),
     Col([
         dbc.Input(id='forecast-term_io', type='number',
-                  value=4, style={'width': '170px'}, step=0.001)
+                  value=4, style={'width': '170px'})
     ], align='end'),
 
     html.P('Параметр инфляции'),
@@ -118,7 +118,7 @@ forecasting = Row([
     ]),
     Col([
         dbc.Input(id='inflation-parameter_io', type='number',
-                  value=1, style={'width': '170px'}, step=0.001)
+                  value=1, style={'width': '170px'})
     ], align='end'),
     dbc.Checklist(
         options=[
