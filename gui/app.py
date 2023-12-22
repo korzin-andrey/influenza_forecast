@@ -683,9 +683,6 @@ def save_plot(_, incidence, exposed_values,
     """
     Saves plot
     """
-    colors = px.colors.qualitative.D3
-    colors_unexistant = ["#383838", "#585858", "#696969", "#909090"]
-    error_structures = ["#D3D3D3", "#E5E4E2", "#C0C0C0", "#A9A9A9"]
     exposed_list = exposed_values
     lam_list = lambda_values
     a_list = [a]
@@ -696,151 +693,14 @@ def save_plot(_, incidence, exposed_values,
     if sample_size > len(epid_data.index):
         fig = update_graph(_, incidence, exposed_values,
                             lambda_values, a, mu, delta, sample_size, city, year)
-        fig.write_image(os.path.join('plots',r"week_{}_forecast.png".format(incidence)))
-        return fig
         
-
-    fig = go.Figure()
-
-    model_obj.init_simul_params(
-        exposed_list=exposed_list, lam_list=lam_list, a=a_list)
-    model_obj.set_attributes()
-    simul_data, _, _, _, _ = model_obj.make_simulation()
-    simul_weekly = transform_days_to_weeks(simul_data, groups)
-
-    epid_data.index = epid_data.reset_index().index + delta
-    m, n = epid_data.index[0], epid_data.index[-1]
-    last_simul_ind = n + 15
-
-    ds_amount = int(100 / len(simul_weekly.columns))
-
-    predict_gates_generator = PredictGatesGenerator(epid_data.loc[:, simul_weekly.columns],
-                                                    simul_weekly.dropna(
-                                                        axis=1),
-                                                    ds_amount, sample_size, inflation_parameter, end=last_simul_ind)
-    percentiles = [(5, 95)]
-    gates = [
-        predict_gates_generator.generate_predict_gate(
-            p[0], p[1], length=forecast_term)
-        for p in percentiles
-    ]
-    xticks_vals, xticks_text = generate_xticks(epid_data, year, last_simul_ind)
-    pos_x = xticks_vals[xticks_vals['year'] == year].index[-1]
-
-    r_squared = r2_score(epid_data[groups], simul_weekly.iloc[delta:epid_data.index[-1] + 1, :],
-                         multioutput='raw_values')
-
-    labels = [group if '15 и ст.' not in group
-              else group.replace('15 и ст.', '15+') for group in groups]
-
-    for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
-        fig.add_trace(go.Scatter(x=epid_data[group][sample_size - 1:sample_size + 1].index,
-                                 y=epid_data[group][sample_size -
-                                                    1:sample_size + 1],
-                                 customdata=epid_data.loc[sample_size -
-                                                          1:sample_size + 1, ['Неделя']],
-                                 mode='lines',
-                                 line={'dash': 'dash', 'shape': 'spline',
-                                       'color': f'rgba{(*hex_to_rgb(colors[i]), 0.5)}'}, showlegend=False))
-
-        # points of data
-        fig.add_trace(go.Scatter(x=epid_data[group][:sample_size].index,
-                                 y=epid_data[group][:sample_size],
-                                 customdata=epid_data.loc[:, ['Неделя']],
-                                 hovertemplate="<br>%{customdata[0]} неделя"
-                                               "<br>Количество заболеваний: %{y}"
-                                               "<extra></extra>",
-                                 mode='markers+lines',
-                                 legendgroup='data',
-                                 line={'dash': 'dash', 'shape': 'spline',
-                                       'color': f'rgba{(*hex_to_rgb(colors[i]), 0.5)}'},
-                                 marker={'color': colors[i], 'size': 10, },
-                                 name='Данные, ' + label))
-        # lines of the model
-        fig.add_trace(go.Scatter(x=simul_weekly[group].index[:last_simul_ind],
-                                 y=simul_weekly[group][:last_simul_ind],
-                                 hovertemplate="<br>Количество заболеваний: %{y}"
-                                               "<extra></extra>",
-                                 mode='lines',
-                                 legendgroup='model-fit',
-                                 marker={'color': colors[i], 'size': 10},
-                                 name='Модель, ' + label))
-
-        pr_m = m + sample_size - 1
-        pr_n = m + sample_size + forecast_term
-        if plot_error_structures:
-            for simulated_error_ds in predict_gates_generator.simulated_datasets:
-                fig.add_trace(go.Scatter(x=simulated_error_ds[group].index[pr_m:pr_n],
-                                         y=simulated_error_ds[group][pr_m:pr_n],
-                                         hovertemplate="Негативная биномиальная структура ошибок"
-                                                       "<extra></extra>",
-                                         mode='lines',
-                                         line={
-                                             'color': f'rgba{(*hex_to_rgb(error_structures[i]), 0.3)}'},
-                                         showlegend=False))
-
-        for gate_i, gate_list in enumerate(gates):
-            predict_gate = next(
-                filter(lambda gt: gt.column == group, gate_list))
-            x_ = predict_gate.x[sample_size -
-                                1:sample_size + predict_gate.length]
-            y1_ = predict_gate.y_min[sample_size -
-                                     1:sample_size + predict_gate.length]
-            y2_ = predict_gate.y_max[sample_size -
-                                     1:sample_size + predict_gate.length]
-
-            y1_[0] = y2_[
-                0] = simul_weekly[predict_gate.column][predict_gate.week_begin + sample_size - 1]
-
-            # borders of prediction
-            fig.add_trace(go.Scatter(x=x_, y=y1_, fill=None, fillcolor=f'rgba{(*hex_to_rgb(colors[i]), 0.3)}',
-                                     mode='lines', showlegend=False,
-                                     marker={'color': "rgba(255,0,0,0.5)", 'size': 10}))
-
-            fig.add_trace(go.Scatter(x=x_, y=y2_, fill='tonexty', fillcolor=f'rgba{(*hex_to_rgb(colors[i]), 0.3)}',
-                                     mode='lines',
-                                     name=f"Границы прогноза (PR: {percentiles[gate_i][0]}-{percentiles[gate_i][1]}), {label}",
-                                     marker={'color': "rgba(255,0,0,0.5)", 'size': 10}))
-
-    for i, r2 in enumerate(r_squared):
-        fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
-                           showarrow=False,
-                           xanchor='left',
-                           xref='paper',
-                           x=0.03,
-                           yshift=i * (-25) + 300,
-                           font={'color': colors[i], 'size': 18})
-    fig.update_layout(
-        template='plotly_white',
-        autosize=False,
-        height=700,
-        margin={'l': 60, 'r': 50, 'b': 50, 't': 50, 'pad': 4},
-        paper_bgcolor="white",
-        title={
-            'text': f"{cities[city]}, {year}-{year + 1} гг.",
-            'font': {'size': 16},
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'},
-        font={'size': 13},
-        yaxis={'exponentformat': 'power', 'showtickprefix': 'all'},
-        xaxis={'tickvals': xticks_vals.index, 'ticktext': xticks_text, 'tickangle': 0,
-               'tickfont': {'size': 14}, 'showgrid': False}
-    )
-    border_of_data = m + sample_size - 1
-    fig.add_vline(x=border_of_data,
-                  line_width=3, line_dash="dash", line_color="red",
-                  name=f'Граница доступности <br> данных',
-                  showlegend=True)
-    fig.add_vline(x=pos_x, line_width=2, line_dash="dash", line_color="green",
-                  name=f'Граница  <br>{year}-{year + 1} годов',
-                  showlegend=True)
-    fig.update_xaxes(title_text="Недели")
-    fig.update_yaxes(title_text="Количество случаев заболевания")
-    print("Saving...")
-    fig.write_image(os.path.join('plots', r"week_{}_forecast.png".format(1,incidence)))
-    return fig
+    else:
+        fig = update_graph_predict(_, incidence, exposed_values,
+                         lambda_values, a, mu, delta, sample_size, city, year,
+                         forecast_term, inflation_parameter, plot_error_structures)
+    fig.write_image(os.path.join('gui/static/plots',r"week_{}_forecast.png".format(incidence)))
+    return fig   
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=False, host="0.0.0.0", port=8050)
