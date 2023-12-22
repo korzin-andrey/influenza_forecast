@@ -52,22 +52,22 @@ def get_lambda_sliders(lambda_=(0.13516497447559267, 0.09344715673194291, 0.0769
 def get_exposed_inputs(exposed=(0.8318945681908346, 0.4532701740867703, 0.11561966774301881)):
     return {
         'A(H1N1)': dbc.Input(id={'type': 'exposed_io', 'index': 0}, type='number',
-                             value=exposed[0], style={'width': '200px'}),
+                             value=exposed[0], style={'width': '200px'}, step=0.001),
         'A(H3N2)': dbc.Input(id={'type': 'exposed_io', 'index': 1}, type='number',
-                             value=exposed[1], style={'width': '200px'}),
+                             value=exposed[1], style={'width': '200px'}, step=0.001),
         'B': dbc.Input(id={'type': 'exposed_io', 'index': 2}, type='number',
-                       value=exposed[2], style={'width': '200px'})
+                       value=exposed[2], style={'width': '200px'}, step=0.001)
     }
 
 
 def get_lambda_inputs(lambda_=(0.13516497447559267, 0.09344715673194291, 0.07693719659160894)):
     return {
         'A(H1N1)': dbc.Input(id={'type': 'lambda_io', 'index': 0}, type='number',
-                             value=lambda_[0], style={'width': '200px'}),
+                             value=lambda_[0], style={'width': '200px'}, step=0.001),
         'A(H3N2)': dbc.Input(id={'type': 'lambda_io', 'index': 1}, type='number',
-                             value=lambda_[1], style={'width': '200px'}),
+                             value=lambda_[1], style={'width': '200px'}, step=0.001),
         'B': dbc.Input(id={'type': 'lambda_io', 'index': 2}, type='number',
-                       value=lambda_[2], style={'width': '200px'})
+                       value=lambda_[2], style={'width': '200px'}, step=0.001)
     }
 
 

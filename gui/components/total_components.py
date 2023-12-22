@@ -17,12 +17,12 @@ def get_lambda_sliders(lambda_=(0.16707651314610894,)):
 
 def get_exposed_inputs(exposed=(0.6081385649385342,)):
     return dbc.Input(id={'type': 'exposed_io', 'index': 0}, type='number',
-                     value=exposed[0], style={'width': '170px'})
+                     value=exposed[0], style={'width': '170px'}, step=0.001)
 
 
 def get_lambda_inputs(lambda_=(0.16707651314610894,)):
     return dbc.Input(id={'type': 'lambda_io', 'index': 0}, type='number',
-                     value=lambda_[0], style={'width': '170px'})
+                     value=lambda_[0], style={'width': '170px'}, step=0.001)
 
 
 def get_total_c(exposed_params=(0.6081385649385342,), lambda_params=(0.16707651314610894,)):

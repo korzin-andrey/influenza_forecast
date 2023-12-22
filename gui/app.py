@@ -46,7 +46,7 @@ app = DashProxy(__name__,
 
 app.layout = layout
 PRESET_MODE = False
-
+a_default = None
 
 @app.callback(
     [Output('exposed-accordion-item', 'children', allow_duplicate=True),
@@ -97,7 +97,8 @@ def update_sliders(exposed_io, lambda_io, a_io, mu_io, delta_io, sample_io, fore
     Returns values to the all slider components from the all input components
     (1st callback of the mutually dependent components: sliders and inputs)
     """
-    return [exposed_io, lambda_io, a_io, mu_io, delta_io, sample_io, forecast_term_io, inflation_parameter_io]
+    global a_default
+    return [exposed_io, lambda_io, a_io if a_io!=None else a_default, mu_io, delta_io, sample_io, forecast_term_io, inflation_parameter_io]
 
 
 @app.callback(
@@ -124,7 +125,8 @@ def update_inputs(exposed, lambda_, a, mu, delta, sample, forecast_term, inflati
     Returns values to the all input components from the all slider components
     (2nd callback of the mutually dependent components: sliders and inputs)
     """
-    return [exposed, lambda_, a, mu, delta, sample, forecast_term, inflation_parameter]
+    global a_default
+    return [exposed, lambda_, a if a!=None else a_default, mu, delta, sample, forecast_term, inflation_parameter]
 
 
 # @app.callback(
@@ -444,7 +446,7 @@ def update_graph_predict(_, incidence, exposed_values,
 
     return fig
 
-
+'''
 @app.callback(Input("ci-button", "n_clicks"),
               Output("download-ci-request-json", "data"),
               State('incidence', 'value'),
@@ -518,7 +520,7 @@ def bulletin_client_call(_, incidence, exposed_values,
     # bulletin_generator.generate_bulletin()
     return dict(content=json.dumps(bulletin_request),
                 filename=f"request_for_bulletin_{current_time.replace(' ', '_')}{simulation_type_string}.json")
-
+'''
 
 @app.callback([Output('data_components', 'children', allow_duplicate=True),
                Output('city', 'value', allow_duplicate=True),
@@ -534,7 +536,7 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
     year_default = '2010'
 
     component_bunch = age_groups_comps.get_multi_age_c()
-
+    global a_default
     a_default = 0.01093982936993367
     mu_default = 0.2
     delta_default = 30
@@ -580,7 +582,7 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
 @app.callback(    
     Input('calibration-button', 'n_clicks'),
     
-    # Output('loading', 'children'),
+    #Output('loading', 'children'),
     Output("download-preset", "data"),
     
 
@@ -843,4 +845,4 @@ def save_plot(_, incidence, exposed_values,
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

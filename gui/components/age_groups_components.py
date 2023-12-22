@@ -28,15 +28,15 @@ def get_lambda_sliders(lambda_=(0.3400433789879575,)):
 def get_exposed_inputs(exposed=(0.005, 0.7)):
     return {
         '0-14': dbc.Input(id={'type': 'exposed_io', 'index': 0},
-                          value=exposed[0], type='number', style={'width': '200px'}),
+                          value=exposed[0], type='number', style={'width': '200px'}, step=0.001),
         '15+': dbc.Input(id={'type': 'exposed_io', 'index': 1},
-                         value=exposed[1], type='number', style={'width': '200px'})
+                         value=exposed[1], type='number', style={'width': '200px'}, step=0.001)
     }
 
 
 def get_lambda_inputs(lambda_=(0.3400433789879575,)):
     return {'generic': dbc.Input(id={'type': 'lambda_io', 'index': 0}, type='number',
-                                 value=lambda_[0], style={'width': '200px'})}
+                                 value=lambda_[0], style={'width': '200px'}, step=0.001)}
 
 
 def get_multi_age_c(exposed_params=(0.005, 0.7), lambda_params=(0.3400433789879575,)):

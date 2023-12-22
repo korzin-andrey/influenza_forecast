@@ -57,7 +57,7 @@ def get_a_layout(value):
         ]),
         Col([
             dbc.Input(id='a_io', type='number',
-                      value=value, style={'width': '170px'})
+                      value=value, style={'width': '170px'}, step=0.001)
         ], align='end')
     ])
 
@@ -70,7 +70,7 @@ def get_mu_layout(value):
         ]),
         Col([
             dbc.Input(id='mu_io', type='number',
-                      value=value, style={'width': '170px'})
+                      value=value, style={'width': '170px'}, step=0.001)
         ], align='end')
     ])
 
@@ -83,7 +83,7 @@ def get_delta_layout(value):
         ]),
         Col([
             dbc.Input(id='delta_io', type='number',
-                      value=value, style={'width': '170px'})
+                      value=value, style={'width': '170px'}, step=0.001)
         ], align='end')
     ])
 
@@ -96,7 +96,7 @@ sample = Row([
     ]),
     Col([
         dbc.Input(id='sample_io', type='number',
-                  value=52, style={'width': '170px'})
+                  value=52, style={'width': '170px'}, step=0.001)
     ], align='end')
 ])
 
@@ -108,7 +108,7 @@ forecasting = Row([
     ]),
     Col([
         dbc.Input(id='forecast-term_io', type='number',
-                  value=4, style={'width': '170px'})
+                  value=4, style={'width': '170px'}, step=0.001)
     ], align='end'),
 
     html.P('Параметр инфляции'),
@@ -118,7 +118,7 @@ forecasting = Row([
     ]),
     Col([
         dbc.Input(id='inflation-parameter_io', type='number',
-                  value=1, style={'width': '170px'})
+                  value=1, style={'width': '170px'}, step=0.001)
     ], align='end'),
     dbc.Checklist(
         options=[
@@ -161,10 +161,8 @@ buttons = \
         Col([
             html.Div([
                 dbc.ButtonGroup([
-                    html.Div([dbc.Button('Запустить калибровку',
-                               id='calibration-button'),
-                               dcc.Download(id="download-preset")],)
-                    ,
+                    dbc.Button('Запустить калибровку', id='calibration-button'),
+                    dcc.Download(id="download-preset"),
                     # dbc.Button('Остановить калибровку', id='stop-button'),
                     dbc.Button('Запустить моделирование', id='forecast-button'),
                     dbc.Button('Сохранить график', id='save_plot-button'),

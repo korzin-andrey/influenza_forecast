@@ -79,19 +79,19 @@ def get_exposed_inputs(exposed=(0.26934818007330236, 0.9, 0.24085705533787935,
     return {
         '0-14': {
             'A(H1N1)': dbc.Input(id={'type': 'exposed_io', 'index': 0}, type='number',
-                                 value=exposed[0], style={'width': '200px'}),
+                                 value=exposed[0], style={'width': '200px'}, step=0.001),
             'A(H3N2)': dbc.Input(id={'type': 'exposed_io', 'index': 1}, type='number',
-                                 value=exposed[1], style={'width': '200px'}),
+                                 value=exposed[1], style={'width': '200px'}, step=0.001),
             'B': dbc.Input(id={'type': 'exposed_io', 'index': 2}, type='number',
-                           value=exposed[2], style={'width': '200px'})
+                           value=exposed[2], style={'width': '200px'}, step=0.001)
         },
         '15+': {
             'A(H1N1)': dbc.Input(id={'type': 'exposed_io', 'index': 3}, type='number',
-                                 value=exposed[3], style={'width': '200px'}),
+                                 value=exposed[3], style={'width': '200px'}, step=0.001),
             'A(H3N2)': dbc.Input(id={'type': 'exposed_io', 'index': 4}, type='number',
-                                 value=exposed[4], style={'width': '200px'}),
+                                 value=exposed[4], style={'width': '200px'}, step=0.001),
             'B': dbc.Input(id={'type': 'exposed_io', 'index': 5}, type='number',
-                           value=exposed[5], style={'width': '200px'})
+                           value=exposed[5], style={'width': '200px'}, step=0.001)
         }
     }
 
@@ -99,11 +99,11 @@ def get_exposed_inputs(exposed=(0.26934818007330236, 0.9, 0.24085705533787935,
 def get_lambda_inputs(lambda_=(0.3, 0.09659722555326276, 0.11197409482841345)):
     return {
         'A(H1N1)': dbc.Input(id={'type': 'lambda_io', 'index': 0}, type='number',
-                             value=lambda_[0], style={'width': '200px'}),
+                             value=lambda_[0], style={'width': '200px'}, step=0.001),
         'A(H3N2)': dbc.Input(id={'type': 'lambda_io', 'index': 1}, type='number',
-                             value=lambda_[1], style={'width': '200px'}),
+                             value=lambda_[1], style={'width': '200px'}, step=0.001),
         'B': dbc.Input(id={'type': 'lambda_io', 'index': 2}, type='number',
-                       value=lambda_[2], style={'width': '200px'})
+                       value=lambda_[2], style={'width': '200px'}, step=0.001)
     }
 
 
