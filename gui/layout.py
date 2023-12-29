@@ -161,10 +161,9 @@ buttons = \
         Col([
             html.Div([
                 dbc.ButtonGroup([
-                    html.Div([dbc.Button('Запустить калибровку',
-                               id='calibration-button'),
-                               dcc.Download(id="download-preset")],)
-                    ,
+                    dbc.Button('Запустить калибровку', id='calibration-button'),
+                    dcc.Download(id="download-preset"),
+              
                     # dbc.Button('Остановить калибровку', id='stop-button'),
                     dbc.Button('Запустить моделирование', id='forecast-button'),
                     dbc.Button('Сохранить график', id='save_plot-button'),
