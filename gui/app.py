@@ -925,7 +925,9 @@ def save_plot(_, incidence, exposed_values,
         fig = update_graph_predict(_, incidence, exposed_values,
                          lambda_values, a, mu, delta, sample_size, city, year,
                          forecast_term, inflation_parameter, plot_error_structures)
+
     pio.write_image(fig, os.path.join('gui/static/plots',r"week_{}_forecast.png".format(incidence)), 'png', width=1598, height=700)
+
     return fig   
 
 
