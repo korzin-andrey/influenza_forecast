@@ -1,7 +1,7 @@
 # Start of the work
 
 
-To start the work, please, create and a separate virtual environment by running the following strings 
+To start the work, please, create and a separate virtual environment by running the following lines
 of code 
 
 ------------------------------------------------------------------
