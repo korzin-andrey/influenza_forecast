@@ -1,6 +1,0 @@
-bootstrapping
-data
-models
-optimizers
-utils
-visualization
