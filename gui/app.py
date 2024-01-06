@@ -36,23 +36,18 @@ from dash.long_callback import DiskcacheLongCallbackManager
 import dash
 import plotly.io as pio
 
-##########################
-# Добавил сохранение графика через plotly.io с установленными размерами
-# Закоментил long_callback, т.к. еще не уверен, что он понадобится
-# Добавил функцию, отвечаюшую за обновление exposed&lambda
-# Я посмотрел на разницу в компонентов, и между обновлением exposed&lambda и остальных компонентов огромная разница
-# Мне кажется, что надо будет разделить update_sliders and update_inputs на более мелкие функции
-# Добавил графики
-##########################
+import signal
+from optimizers import multiple_model_fit
+from dash.exceptions import PreventUpdate
 
-# cache = diskcache.Cache("./cache")
-# long_callback_manager = DiskcacheLongCallbackManager(cache)
+cache = diskcache.Cache("./cache")
+long_callback_manager = DiskcacheLongCallbackManager(cache)
 
 app = DashProxy(__name__,
                 transforms=[CycleBreakerTransform()],
                 external_stylesheets=[dbc.themes.MATERIA],
-                prevent_initial_callbacks="initial_duplicate",) 
-                # long_callback_manager=long_callback_manager)
+                prevent_initial_callbacks="initial_duplicate",
+                long_callback_manager=long_callback_manager)
 
 app.layout = layout
 PRESET_MODE = False
@@ -805,6 +800,23 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
 
 
 @app.callback(    
+    Input('calibration-button-stop', 'n_clicks'),
+    
+    Output('calibration-button', 'n_clicks'),
+
+    prevent_initial_call=True,
+)
+def stop_calibration(_):
+    qe = multiple_model_fit.queue
+
+    while not qe.empty():
+        os.kill(qe.get(), signal.SIGKILL)
+    
+    if True:
+        raise PreventUpdate
+    return 0
+
+@app.callback(    
     Input('calibration-button', 'n_clicks'),
     
     # Output('loading', 'children'),
@@ -828,9 +840,10 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
 
     running=[
         (Output("calibration-button", "disabled"), True, False),
+        (Output("calibration-button-stop", "disabled"), False, True)
     ],
     prevent_initial_call=True,
-    # background=True, 
+    background=True, 
 )
 def launch_calibration(_, incidence, exposed_values,
                          lambda_values, a, mu, delta, sample_size, city, year,
@@ -930,4 +943,4 @@ def save_plot(_, incidence, exposed_values,
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host="0.0.0.0", port=8050)
+    app.run(debug=True, host="0.0.0.0", port=8050)

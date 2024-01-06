@@ -3,9 +3,12 @@ import numpy as np
 from pathos.multiprocessing import ProcessingPool as P_Pool
 import os
 
+from pathos.helpers import mp as pathos_multiprocess
+queue = pathos_multiprocess.Manager().Queue()
 
 def _calibration_fit_func(arg_tuple):
-    optimizer, kwargs = arg_tuple
+    optimizer, kwargs, queue = arg_tuple
+    queue.put(os.getpid())
     opt_parameters = optimizer.fit_one_outbreak(**kwargs)
     return optimizer, opt_parameters
 
@@ -67,10 +70,12 @@ class MultipleModelFit:
         return obj
 
     def fit_n_outbreaks(self, **kwargs):
+        global queue
+        queue.put(os.getpid())
 
         with P_Pool(min(len(self.optimizers), os.cpu_count()-1)) as pool:
             results = pool.amap(_calibration_fit_func,
-                                [(optimizer, kwargs)
+                                [(optimizer, kwargs, queue)
                                  for optimizer in self.optimizers])
             pool.close()
             pool.join()
