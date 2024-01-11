@@ -624,7 +624,7 @@ def update_graph_predict(_, incidence, exposed_values,
                   fillcolor="rgb(199, 255, 194)",
                   showlegend=True,
                   legend='legend4',
-                  name='Известных данных'
+                  name='известных данных'
                   )
 
     # area with unknowm data
@@ -644,7 +644,7 @@ def update_graph_predict(_, incidence, exposed_values,
                   fillcolor="rgb(255, 197, 197)",
                   showlegend=True,
                   legend='legend4',
-                  name='Без данных'
+                  name='без данных'
                   )
 
     # years separation line
