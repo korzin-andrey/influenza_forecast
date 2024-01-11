@@ -107,7 +107,7 @@ def generate_xticks(epid_data, year, last_simul_ind):
         else:
             last_week_num = 0
 
-    for i in range(m, -1, -1):
+    for i in range(m-1, -1, -1):
         xticks_vals.loc[i, ['week']] = first_week_num - 1
         xticks_vals.loc[i, ['year']] = year - 1
         if first_week_num != 0:
@@ -161,7 +161,6 @@ def lambda_dict_to_inputs(lambda_dict, incidence):
         return [lambda_dict['A(H1N1)'], lambda_dict['A(H3N2)'], lambda_dict['B']]
     else:
         raise ValueError(f"can't parse incidence: {incidence}")
-
 
 
 cities = {'spb': 'Санкт-Петербург',

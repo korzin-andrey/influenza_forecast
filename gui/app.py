@@ -1,3 +1,4 @@
+from flask import send_from_directory
 import base64
 import json
 import datetime
@@ -40,6 +41,7 @@ import signal
 from optimizers import multiple_model_fit
 from dash.exceptions import PreventUpdate
 
+
 cache = diskcache.Cache("./cache")
 long_callback_manager = DiskcacheLongCallbackManager(cache)
 
@@ -48,7 +50,7 @@ app = DashProxy(__name__,
                 external_stylesheets=[dbc.themes.MATERIA],
                 prevent_initial_callbacks="initial_duplicate",
                 long_callback_manager=long_callback_manager)
-
+app._favicon = ("favicon.ico")
 app.layout = layout
 PRESET_MODE = False
 
@@ -194,9 +196,12 @@ def update_graph(_, incidence, exposed_values,
 
     epid_data.index = epid_data.reset_index().index + delta
     m, n = epid_data.index[0], epid_data.index[-1]
-    last_simul_ind = n + 15
+    last_simul_ind = n + 5
+    print("Last simul index:", last_simul_ind)
 
     xticks_vals, xticks_text = generate_xticks(epid_data, year, last_simul_ind)
+    print(xticks_vals)
+    print(xticks_text)
     pos_x = xticks_vals[xticks_vals['year'] == year].index[-1]
 
     r_squared = r2_score(epid_data[groups], simul_weekly.iloc[delta:epid_data.index[-1] + 1, :],
