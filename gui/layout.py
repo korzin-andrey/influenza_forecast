@@ -11,9 +11,9 @@ config = dict(displaylogo=False, responsive=True,
 
 cities = [html.P('Город', style={'margin': '20px 20px'}),
           dcc.RadioItems(options=[{'label': 'Санкт-Петербург', 'value': 'spb'},
-                                #   {'label': 'Москва', 'value': 'msc',
-                                #       'disabled': True},
-                                #   {'label': 'Новосибирск', 'value': 'novosib', 'disabled': True}
+                                  #   {'label': 'Москва', 'value': 'msc',
+                                  #       'disabled': True},
+                                  #   {'label': 'Новосибирск', 'value': 'novosib', 'disabled': True}
                                   ],
                          value='spb',
                          inputStyle={"marginRight": "10px",
@@ -161,18 +161,21 @@ buttons = \
         Col([
             html.Div([
                 dbc.ButtonGroup([
-                    dbc.Button('Запустить калибровку', id='calibration-button'),
+                    dbc.Button('Запустить калибровку',
+                               id='calibration-button'),
                     dcc.Download(id="download-preset"),
-                    dbc.Button('Остановить калибровку', id='calibration-button-stop', disabled=True),
-                    dbc.Button('Запустить моделирование', id='forecast-button'),
+                    dbc.Button('Остановить калибровку',
+                               id='calibration-button-stop', disabled=True),
+                    dbc.Button('Запустить моделирование',
+                               id='forecast-button'),
                     dbc.Button('Сохранить график', id='save_plot-button'),
                     # dbc.Button('Построить прогноз', id='forecast-button'),
-        #             dcc.Loading(
-        #     id="loading",
-        #     type="circle",
-        #     children=html.Div(id="loading"),
-        #     fullscreen=True
-        # ),
+                    #             dcc.Loading(
+                    #     id="loading",
+                    #     type="circle",
+                    #     children=html.Div(id="loading"),
+                    #     fullscreen=True
+                    # ),
                     # html.Div([
                     #     dbc.Button('Генерация бюллетеня', id='ci-button'),
                     #     dcc.Download(id="download-ci-request-json")],)
@@ -204,41 +207,42 @@ preset_components = html.Div([
 
 documentation = html.Div(
     [html.Div('Инструкция',
-             style={'textAlign': 'center', 'fontSize': 20,'font-weight': 'bold'}),
-    html.Div(children='''Данный веб-интерфейс предназначен для прогнозирования количества заболеваний 
+              style={'textAlign': 'center', 'fontSize': 20, 'font-weight': 'bold'}),
+     html.Div(children='''Данный веб-интерфейс предназначен для прогнозирования количества заболеваний 
             гриппом и ОРВИ, а также составления графиков на основе моделирования.
             '''),
-    html.Div(children='''Интерфейс состоит из трёх вкладок:'''),
-    html.Li(children='Данные', style={'font-weight': 'bold'}),
-    html.Div(children='''Раздел позволяет выбрать год для которого необходимо провести моделирование.
+     html.Div(children='''Интерфейс состоит из трёх вкладок:'''),
+     html.Li(children='Данные', style={'font-weight': 'bold'}),
+     html.Div(children='''Раздел позволяет выбрать год для которого необходимо провести моделирование.
              Уровень детализированности позволяет выбрать режим моделирования.'''),
-    html.Li(children='Параметры модели', style={'font-weight': 'bold'}),
-    html.Div(children=''' Раздел представляет основное окно для просмотра и изменения параметров модели, 
+     html.Li(children='Параметры модели', style={'font-weight': 'bold'}),
+     html.Div(children=''' Раздел представляет основное окно для просмотра и изменения параметров модели, 
              а также визуального анализа графика. Кроме этого, присутствуют кнопки: запустить калибровку, 
              запустить моделирование, сохранить график и сгенерировать бюллетень.'''),
-    html.Ul([html.Li(children='Запустить калибровку'),
-            html.Div(children=''' Нажатие кнопки инициирует запуск калибровки модели: для доступных
+     html.Ul([html.Li(children='Запустить калибровку'),
+              html.Div(children=''' Нажатие кнопки инициирует запуск калибровки модели: для доступных
                      данных по заболеваемости вычисляются оптимальные параметры модели, при 
                      которых кривая графика моделирования будет приближать реальные данные. Во время работы
                      калибровки кнопка становится "неактивной", время калибровки составляет несколько минут. 
                      После окончания калибровки на компьютер скачается файл пресета. Этот файл можно использовать для
                      воссоздания графика во вкладке "пресеты".'''),
-            html.Li(children='Запустить моделирование'),
-            html.Div(children=''' Нажатие кнопки инициирует запуск моделирования и построение графика. Данную 
+              html.Li(children='Запустить моделирование'),
+              html.Div(children=''' Нажатие кнопки инициирует запуск моделирования и построение графика. Данную 
                      опцию необходимо использовать после изменения параметров модели, чтобы обновить график с использованием
                      актуальных параметров. '''),
-            html.Li(children='Сохранить график'),
-            html.Div(children=''' После нажатия график сохраняется на сервер для дальнейшего использования. '''),
-            # html.Li(children='Сгенерировать бюллетень'),
-            # html.Div(children='''Генерирует pdf-бюллетень с графиками и текстовым описанием.'''),
-             ]),
+              html.Li(children='Сохранить график'),
+              html.Div(
+         children=''' После нажатия график сохраняется на сервер для дальнейшего использования. '''),
+         # html.Li(children='Сгенерировать бюллетень'),
+         # html.Div(children='''Генерирует pdf-бюллетень с графиками и текстовым описанием.'''),
+     ]),
 
-    html.Li(children='Пресеты', style={'font-weight': 'bold'}),
-    html.Div(children=''' В данном разделе можно загрузить файл пресета - специальный файл, содержащий 
+     html.Li(children='Пресеты', style={'font-weight': 'bold'}),
+     html.Div(children=''' В данном разделе можно загрузить файл пресета - специальный файл, содержащий 
              всю необходимую информацию для воссоздания графика по данным определенного периода. После 
              загрузки файла пресета необходимо перейти во вкладку "Параметры модели" 
              и нажать "запустить моделирование" '''),
-    ]
+     ]
 )
 
 upper_row = \
@@ -246,10 +250,10 @@ upper_row = \
         Col([
             html.Div([
                 dbc.Tabs([
-                    dbc.Tab([data_components], label='Данные',
-                            id='data-components'),
                     dbc.Tab([model_components, buttons],
                             label='Параметры модели', id='model-components'),
+                    dbc.Tab([data_components], label='Данные',
+                            id='data-components'),
                     dbc.Tab([preset_components], label='Пресеты',
                             id='preset-components'),
                     dbc.Tab([documentation], label='Инструкция',

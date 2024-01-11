@@ -92,13 +92,17 @@ def update_components(incidence):
 )
 def update_exposed_and_lambda(exposed_io, lambda_io, exposed, lambda_):
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    
+
     if "exposed" in trigger_id:
-        if "io" in trigger_id: exposed = exposed_io
-        else: exposed_io = exposed
+        if "io" in trigger_id:
+            exposed = exposed_io
+        else:
+            exposed_io = exposed
     else:
-        if "io" in trigger_id: lambda_ = lambda_io
-        else: lambda_io = lambda_
+        if "io" in trigger_id:
+            lambda_ = lambda_io
+        else:
+            lambda_io = lambda_
 
     return exposed, lambda_, exposed_io, lambda_io
 
@@ -205,7 +209,8 @@ def update_graph(_, incidence, exposed_values,
     y0_rect = 0
     for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
 
-        y0_rect = max(y0_rect, max(simul_weekly[group][:last_simul_ind]), max(epid_data[group]))
+        y0_rect = max(y0_rect, max(
+            simul_weekly[group][:last_simul_ind]), max(epid_data[group]))
         fig.add_trace(go.Scatter(x=epid_data[group].index,
                                  y=epid_data[group],
                                  customdata=epid_data.loc[:, ['Неделя']],
@@ -220,7 +225,7 @@ def update_graph(_, incidence, exposed_values,
                                  marker={'color': colors[i], 'size': 10, },
                                  line_shape='linear',
                                  name=label))
-        
+
         fig.add_trace(go.Scatter(x=simul_weekly[group].index[:last_simul_ind],
                                  y=simul_weekly[group][:last_simul_ind],
                                  hovertemplate="<br>Количество заболеваний: %{y}"
@@ -230,7 +235,7 @@ def update_graph(_, incidence, exposed_values,
                                  legendgroup='model',
                                  marker={'color': colors[i], 'size': 10},
                                  line_shape='spline',
-                                 name=label)) 
+                                 name=label))
 
     for i, r2 in enumerate(r_squared):
         fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
@@ -239,11 +244,13 @@ def update_graph(_, incidence, exposed_values,
                            xref='paper',
                            x=0.03,
                            yshift=i * (-25) + 405,
-                           font={'color': colors[i], 'size': 60, "family": "Times New Roman"},
+                           font={'color': colors[i], 'size': 60,
+                                 "family": "Times New Roman"},
                            bgcolor="rgb(255, 255, 255)",
                            opacity=0.8)
-    
-    model_y = {"total": 0.845, "strain_age-group": 0.13, "strain": 0.73, "age-group": 0.785}    
+
+    model_y = {"total": 0.845, "strain_age-group": 0.13,
+               "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
 
     fig.update_layout(
@@ -256,7 +263,7 @@ def update_graph(_, incidence, exposed_values,
             'font': {'size': 40},
             "font_family": "Times New Roman",
             'xanchor': 'center',
-            },
+        },
 
         yaxis={'tickfont': {'size': 20}},
         xaxis={'tickvals': xticks_vals.index, 'ticktext': xticks_text, 'tickangle': 0,
@@ -268,11 +275,11 @@ def update_graph(_, incidence, exposed_values,
             "font": {
                 "family": "Courier",
                 "size": 23,
-                "color": "black"            
+                "color": "black"
             },
             "bgcolor": "rgb(255, 255, 255)",
             "bordercolor": "Black",
-            "borderwidth": 2        
+            "borderwidth": 2
         },
         legend2={
             "title": " Модель ",
@@ -281,48 +288,50 @@ def update_graph(_, incidence, exposed_values,
             "font": {
                 "family": "Courier",
                 "size": 23,
-                "color": "black"            
+                "color": "black"
             },
             "bgcolor": "rgb(255, 255, 255)",
             "bordercolor": "Black",
-            "borderwidth": 2  
+            "borderwidth": 2
         }
     )
-    
 
     y0_rect = y0_rect + 1400
 
     fig.add_trace(go.Scatter(x=[pos_x]*int(y0_rect*1.03), y=[i for i in range(int(y0_rect*1.05))],
-                    line=dict(color='rgba(0, 128, 0, 0.6)', width=3, dash='dot'),
-                    name='dash', showlegend=False))
-
-
-    
-    fig.add_shape(type="rect",
-    x0=0, y0=y0_rect*1.03, x1=pos_x, y1=y0_rect*1.101,
-    line=dict(
-        color="rgba(211, 211, 211, 0.6)",
-        width=2,
-    ),
-    fillcolor="rgba(135, 206, 250, 0.6)",
-    label=dict(text=f"{year}", textposition="top center", font=dict(size=25))
-    )
+                             line=dict(color='rgba(0, 128, 0, 0.6)',
+                                       width=3, dash='dot'),
+                             name='dash', showlegend=False))
 
     fig.add_shape(type="rect",
-    x0=pos_x, y0=y0_rect*1.03, y1=y0_rect*1.101, x1=len(xticks_text)-1,
-    line=dict(
-        color="rgba(211, 211, 211, 0.6)",
-        width=2,
-    ),
-    fillcolor="rgba(135, 206, 250, 0.6)",
-    label=dict(text=f"{year+1}", textposition="top center", font=dict(size=25))
-    )
+                  x0=0, y0=y0_rect*1.03, x1=pos_x, y1=y0_rect*1.101,
+                  line=dict(
+                      color="rgba(211, 211, 211, 0.6)",
+                      width=2,
+                  ),
+                  fillcolor="rgba(135, 206, 250, 0.6)",
+                  label=dict(text=f"{year}", textposition="top center",
+                             font=dict(size=25))
+                  )
 
-    # ось х    
-    fig.update_xaxes(title_text="Номер недели в году", title_font_size=25, showline=True, linewidth=2, linecolor='black', mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
-    
+    fig.add_shape(type="rect",
+                  x0=pos_x, y0=y0_rect*1.03, y1=y0_rect*1.101, x1=len(xticks_text)-1,
+                  line=dict(
+                      color="rgba(211, 211, 211, 0.6)",
+                      width=2,
+                  ),
+                  fillcolor="rgba(135, 206, 250, 0.6)",
+                  label=dict(text=f"{year+1}",
+                             textposition="top center", font=dict(size=25))
+                  )
+
+    # ось х
+    fig.update_xaxes(title_text="Номер недели в году", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+                     mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
+
     # ось у
-    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black', mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
+    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+                     mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
     return fig
 
@@ -380,7 +389,7 @@ def update_graph_predict(_, incidence, exposed_values,
     last_simul_ind = n + 15
 
     ds_amount = int(100 / len(simul_weekly.columns))
-    
+
     '''
     print(epid_data.loc[:, simul_weekly.columns])
     print(simul_weekly.dropna(axis=1))
@@ -414,12 +423,13 @@ def update_graph_predict(_, incidence, exposed_values,
 
     labels = [group if '15 и ст.' not in group
               else group.replace('15 и ст.', '15+') for group in groups]
-    
+
     y0_rect = 0
     x0_start = float('inf')
     x1_end = 0
     for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
-        y0_rect = max(y0_rect, max(simul_weekly[group][:last_simul_ind]), max(epid_data[group]))
+        y0_rect = max(y0_rect, max(
+            simul_weekly[group][:last_simul_ind]), max(epid_data[group]))
         x0_start = min(x0_start, epid_data[group][:sample_size].index[0])
         x1_end = max(x1_end, epid_data[group][sample_size:].index[-1])
         fig.add_trace(go.Scatter(x=epid_data[group][sample_size - 1:sample_size + 1].index,
@@ -442,25 +452,25 @@ def update_graph_predict(_, incidence, exposed_values,
                                  legend='legend3',
                                  legendgroup='data',
                                  line={'dash': 'dash', 'shape': 'spline',
-                                       'color': f'rgba{(*hex_to_rgb(colors[i]), 0.5)}'},
+                                       'color': f'rgba{(*hex_to_rgb(colors[i])  , 0.5)}'},
                                  marker={'color': colors[i], 'size': 10, },
                                  name=label))
 
-        # points of predict
-        fig.add_trace(go.Scatter(x=epid_data[group][sample_size:].index,
-                                  y=epid_data[group][sample_size:],
-                                  customdata=epid_data.loc[sample_size:, [
-                                      'Неделя']],
-                                  hovertemplate="<br>Количество заболеваний: %{y}"
-                                                "<extra></extra>",
-                                  mode='markers+lines',
-                                  line={'dash': 'dash', 'shape': 'spline',
-                                        'color': f'rgba{(*hex_to_rgb(colors[i]), 0.5)}'},
-                                  legend='legend',
-                                  legendgroup='data',
-                                  marker={
-                                      'color': colors[i], 'size': 10, 'opacity': 0.5},
-                                  showlegend=False))
+        # # points of predict - NO NEED TO SHOW, actually we do not know them
+        # fig.add_trace(go.Scatter(x=epid_data[group][sample_size:].index,
+        #                           y=epid_data[group][sample_size:],
+        #                           customdata=epid_data.loc[sample_size:, [
+        #                               'Неделя']],
+        #                           hovertemplate="<br>Количество заболеваний: %{y}"
+        #                                         "<extra></extra>",
+        #                           mode='markers+lines',
+        #                           line={'dash': 'dash', 'shape': 'spline',
+        #                                 'color': f'rgba{(*hex_to_rgb(colors[i]), 0.5)}'},
+        #                           legend='legend',
+        #                           legendgroup='data',
+        #                           marker={
+        #                               'color': colors[i], 'size': 10, 'opacity': 0.5},
+        #                           showlegend=False))
 
         # lines of the model
         fig.add_trace(go.Scatter(x=simul_weekly[group].index[:last_simul_ind],
@@ -516,13 +526,14 @@ def update_graph_predict(_, incidence, exposed_values,
                            xref='paper',
                            x=0.03,
                            yshift=i * (-25) + 300,
-                           font={'color': colors[i], 'size': 18, "family": "Courier New, monospace"},
+                           font={'color': colors[i], 'size': 18,
+                                 "family": "Courier New, monospace"},
                            bgcolor="rgb(255, 255, 255)",
                            opacity=0.8)
 
-    model_y = {"total": 0.845, "strain_age-group": 0.125, "strain": 0.73, "age-group": 0.785}    
+    model_y = {"total": 0.845, "strain_age-group": 0.125,
+               "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
-
 
     fig.update_layout(
         template='none',
@@ -546,11 +557,11 @@ def update_graph_predict(_, incidence, exposed_values,
             "font": {
                 "family": "Times New Roman",
                 "size": 23,
-                "color": "black"            
+                "color": "black"
             },
             "bgcolor": "rgb(255, 255, 255)",
             "bordercolor": "Black",
-            "borderwidth": 2        
+            "borderwidth": 2
         },
         legend3={
             "title": " Данные ",
@@ -559,11 +570,11 @@ def update_graph_predict(_, incidence, exposed_values,
             "font": {
                 "family": "Times New Roman",
                 "size": 23,
-                "color": "black"            
+                "color": "black"
             },
             "bgcolor": "rgb(255, 255, 255)",
             "bordercolor": "Black",
-            "borderwidth": 2 
+            "borderwidth": 2
         },
         legend4={
             "title": " Область ",
@@ -573,97 +584,99 @@ def update_graph_predict(_, incidence, exposed_values,
             "font": {
                 "family": "Times New Roman",
                 "size": 23,
-                "color": "black"            
+                "color": "black"
             },
             "bgcolor": "rgb(255, 255, 255)",
             "bordercolor": "Black",
             "borderwidth": 2,
         }
     )
-    
+
     border_of_data = m + sample_size - 1
 
     y0_rect = y0_rect + 1400
 
     # data separation line
     fig.add_trace(go.Scatter(x=[border_of_data]*(int(y0_rect*1.03)), y=[i for i in range(int(y0_rect*1.03))],
-                    line=dict(color='rgba(243, 21, 21, 0.6)', width=3, dash='dot'),
-                    name='dash', showlegend=False))
+                             line=dict(color='rgba(243, 21, 21, 0.6)',
+                                       width=3, dash='dot'),
+                             name='dash', showlegend=False))
 
     # area with known data
     fig.add_shape(type="rect",
-        x0=x0_start, y0=0, x1=border_of_data, y1=y0_rect*1.03,
-        line=dict(
-            width=0,
-        ),
-        fillcolor="rgba(225, 255, 221, 0.35)",
-    )
+                  x0=x0_start, y0=0, x1=border_of_data, y1=y0_rect*1.03,
+                  line=dict(
+                      width=0,
+                  ),
+                  fillcolor="rgba(225, 255, 221, 0.35)",
+                  )
 
     fig.add_shape(type="rect",
-        x0=0, y0=0, x1=0, y1=0,
-        line=dict(
-            width=0,
-        ),
-        fillcolor="rgb(199, 255, 194)",
-        showlegend=True,
-        legend='legend4',
-        name='Известных данных'
-    )
-    
+                  x0=0, y0=0, x1=0, y1=0,
+                  line=dict(
+                      width=0,
+                  ),
+                  fillcolor="rgb(199, 255, 194)",
+                  showlegend=True,
+                  legend='legend4',
+                  name='Известных данных'
+                  )
+
     # area with unknowm data
     fig.add_shape(type="rect",
-        x0=border_of_data, y0=0, x1=x1_end, y1=y0_rect*1.03,
-        line=dict(
-            width=0,
-        ),
-        fillcolor="rgba(255, 224, 224, 0.3)",
-    )
+                  x0=border_of_data, y0=0, x1=x1_end, y1=y0_rect*1.03,
+                  line=dict(
+                      width=0,
+                  ),
+                  fillcolor="rgba(255, 224, 224, 0.3)",
+                  )
 
     fig.add_shape(type="rect",
-        x0=0, y0=0, x1=0, y1=0,
-        line=dict(
-            width=0,
-        ),
-        fillcolor="rgb(255, 197, 197)",
-        showlegend=True,
-        legend='legend4',
-        name='Без данных'
-    )
+                  x0=0, y0=0, x1=0, y1=0,
+                  line=dict(
+                      width=0,
+                  ),
+                  fillcolor="rgb(255, 197, 197)",
+                  showlegend=True,
+                  legend='legend4',
+                  name='Без данных'
+                  )
 
     # years separation line
     fig.add_trace(go.Scatter(x=[pos_x]*int(y0_rect*1.03), y=[i for i in range(int(y0_rect*1.03))],
-                    line=dict(color='rgba(0, 128, 0, 0.6)', width=3, dash='dot'),
-                    name='dash', showlegend=False))
-
-
+                             line=dict(color='rgba(0, 128, 0, 0.6)',
+                                       width=3, dash='dot'),
+                             name='dash', showlegend=False))
 
     # rectangle with year
     fig.add_shape(type="rect",
-    x0=0, y0=y0_rect*1.03, x1=pos_x, y1=y0_rect*1.101,
-    line=dict(
-        color="rgba(211, 211, 211, 0.6)",
-        width=2,
-    ),
-    fillcolor="rgba(135, 206, 250, 0.6)",
-    label=dict(text=f"{year}", textposition="top center", font=dict(size=25))
-    )
-    
+                  x0=0, y0=y0_rect*1.03, x1=pos_x, y1=y0_rect*1.101,
+                  line=dict(
+                      color="rgba(211, 211, 211, 0.6)",
+                      width=2,
+                  ),
+                  fillcolor="rgba(135, 206, 250, 0.6)",
+                  label=dict(text=f"{year}", textposition="top center",
+                             font=dict(size=25))
+                  )
 
     # rectangle with year+1
     fig.add_shape(type="rect",
-    x0=pos_x, y0=y0_rect*1.03, y1=y0_rect*1.101, x1=len(xticks_text)-1,
-    line=dict(
-        color="rgba(211, 211, 211, 0.6)",
-        width=2,
-    ),
-    fillcolor="rgba(135, 206, 250, 0.6)",
-    label=dict(text=f"{year+1}", textposition="top center", font=dict(size=25))
-    )
-  
-    fig.update_xaxes(title_text="Номер недели в году", title_font_size=25, showline=True, linewidth=2, linecolor='black', mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
-    
-    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black', mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
+                  x0=pos_x, y0=y0_rect*1.03, y1=y0_rect*1.101, x1=len(xticks_text)-1,
+                  line=dict(
+                      color="rgba(211, 211, 211, 0.6)",
+                      width=2,
+                  ),
+                  fillcolor="rgba(135, 206, 250, 0.6)",
+                  label=dict(text=f"{year+1}",
+                             textposition="top center", font=dict(size=25))
+                  )
 
+    fig.update_xaxes(title_text="Номер недели в году", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+                     mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
+
+    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+                     mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
     return fig
 
 
@@ -799,9 +812,9 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
             .children[0].children)
 
 
-@app.callback(    
+@app.callback(
     Input('calibration-button-stop', 'n_clicks'),
-    
+
     Output('calibration-button', 'n_clicks'),
 
     prevent_initial_call=True,
@@ -811,17 +824,18 @@ def stop_calibration(_):
 
     while not qe.empty():
         os.kill(qe.get(), signal.SIGKILL)
-    
+
     if True:
         raise PreventUpdate
     return 0
 
-@app.callback(    
+
+@app.callback(
     Input('calibration-button', 'n_clicks'),
-    
+
     # Output('loading', 'children'),
     Output("download-preset", "data"),
-    
+
 
     State('incidence', 'value'),
 
@@ -843,12 +857,12 @@ def stop_calibration(_):
         (Output("calibration-button-stop", "disabled"), False, True)
     ],
     prevent_initial_call=True,
-    background=True, 
+    background=True,
 )
 def launch_calibration(_, incidence, exposed_values,
-                         lambda_values, a, mu, delta, sample_size, city, year,
-                         forecast_term, inflation_parameter, plot_error_structures):
-    
+                       lambda_values, a, mu, delta, sample_size, city, year,
+                       forecast_term, inflation_parameter, plot_error_structures):
+
     print("Calibration started...")
     ''' {'exposed': [0.30148313273350635], 
     'lambda': [0.09544288428775363], 
@@ -864,17 +878,18 @@ def launch_calibration(_, incidence, exposed_values,
     # а - значение "Доля населения, теряющего иммунитет за год"
     # mu - значение "Доля населения, потерявшего иммунитет"
     # delta - значение "Сдвиг данных"
-    # sample - значение "Доступность данных" 
+    # sample - значение "Доступность данных"
     current_time = str(datetime.datetime.now())
 
-    calibration_parameters = calibration.calibration(year=year, mu=mu, incidence=incidence)
-    # calibration_parameters = {'exposed': [0.30148313273350635], 
+    calibration_parameters = calibration.calibration(
+        year=year, mu=mu, incidence=incidence)
+    # calibration_parameters = {'exposed': [0.30148313273350635],
     # 'incidence': 'total',
-    # 'lambda': [0.09544288428775363], 
-    # 'a': [0.13599275369791994], 
-    # 'delta': 57, 
-    # 'total_recovered': [483795.443701321], 
-    # 'R2': [0.5166538711970509], 
+    # 'lambda': [0.09544288428775363],
+    # 'a': [0.13599275369791994],
+    # 'delta': 57,
+    # 'total_recovered': [483795.443701321],
+    # 'R2': [0.5166538711970509],
     # 'r0': [[3.7383068917701014]],
     # 'mu': 0.1}
     # print("Something")
@@ -898,6 +913,7 @@ def launch_calibration(_, incidence, exposed_values,
                 filename=f"{current_time.replace(' ', '_')}_preset.json")
     # return dict(content="Hello world!", filename="hello.txt")
 
+
 @app.callback(
     Output('model-fit', 'figure', allow_duplicate=True),
     Input('save_plot-button', 'n_clicks'),
@@ -918,8 +934,8 @@ def launch_calibration(_, incidence, exposed_values,
     prevent_initial_call=True
 )
 def save_plot(_, incidence, exposed_values,
-                         lambda_values, a, mu, delta, sample_size, city, year,
-                         forecast_term, inflation_parameter, plot_error_structures):
+              lambda_values, a, mu, delta, sample_size, city, year,
+              forecast_term, inflation_parameter, plot_error_structures):
     """
     Saves plot
     """
@@ -932,14 +948,15 @@ def save_plot(_, incidence, exposed_values,
     epid_data, model_obj, groups = get_data_and_model(mu, incidence, year)
     if sample_size > len(epid_data.index):
         fig = update_graph(_, incidence, exposed_values,
-                            lambda_values, a, mu, delta, sample_size, city, year)
-        
+                           lambda_values, a, mu, delta, sample_size, city, year)
+
     else:
         fig = update_graph_predict(_, incidence, exposed_values,
-                         lambda_values, a, mu, delta, sample_size, city, year,
-                         forecast_term, inflation_parameter, plot_error_structures)
-    pio.write_image(fig, os.path.join('gui/static/plots',r"week_{}_forecast.png".format(incidence)), 'png', width=1598, height=700)
-    return fig   
+                                   lambda_values, a, mu, delta, sample_size, city, year,
+                                   forecast_term, inflation_parameter, plot_error_structures)
+    pio.write_image(fig, os.path.join('gui/static/plots',
+                    r"week_{}_forecast.png".format(incidence)), 'png', width=1598, height=700)
+    return fig
 
 
 if __name__ == '__main__':
