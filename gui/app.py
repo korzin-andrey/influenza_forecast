@@ -27,7 +27,6 @@ import calibration
 import time
 import os
 
-
 import diskcache
 from utils.experiment_setup import ExperimentalSetup
 from aux_functions import get_contact_matrix, prepare_calibration_data, get_config
@@ -213,6 +212,7 @@ def update_graph(_, incidence, exposed_values,
     Data = []
     Predict = []
     for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
+
         D = [0]*(delta) + list(epid_data[group])
         P = list(round(simul_weekly[group][:last_simul_ind],0))
         D += [0]*(len(P) - len(D))
@@ -258,8 +258,10 @@ def update_graph(_, incidence, exposed_values,
                                  "family": "Times New Roman"},
                            bgcolor="rgb(255, 255, 255)",
                            opacity=0.8)
+
     global _GENERATE
     _GENERATE = toExcel(incidence, exposed_values, lambda_values, labels, Data, Predict)
+
     model_y = {"total": 0.845, "strain_age-group": 0.13,
                "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
@@ -434,6 +436,7 @@ def update_graph_predict(_, incidence, exposed_values,
     Data = []
     Predict = []
     for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
+
         D = [0]*(delta) + list(epid_data[group][:sample_size])
         P = list(round(simul_weekly[group][:last_simul_ind],0))
         D += [0]*(len(P) - len(D))
@@ -530,6 +533,9 @@ def update_graph_predict(_, incidence, exposed_values,
                                      mode='lines',
                                      name=f"(PR: {percentiles[gate_i][0]}-{percentiles[gate_i][1]}), {label}",
                                      marker={'color': f'rgba{(*hex_to_rgb(colors[i]), 0.3)}', 'size': 10}))
+
+    global _GENERATE
+    _GENERATE = toExcel(incidence, exposed_values, lambda_values, labels, Data, Predict)
 
     for i, r2 in enumerate(r_squared):
         fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',

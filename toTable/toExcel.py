@@ -24,9 +24,14 @@ class toExcel:
 
         self._mainBody(worksheet, bold_сell_format)
 
+        if self.incidence in ['strain', 'strain_age-group']:
+            self._strains(worksheet, bold_сell_format, cell_format, left_format)
+        else:
+            self._strain(worksheet, bold_сell_format, cell_format, left_format)
+
         workbook.close()
 
-    def _mainBody(self, worksheet, bold_сell_format, ):
+    def _mainBody(self, worksheet, bold_сell_format):
         
         
         for i in range(0, self.len3, 3):
@@ -43,8 +48,43 @@ class toExcel:
                 worksheet.write(j+2, i, predict[j])
                 worksheet.write(j+2, i+1, data[j])
 
-    def _strains(self):
-        pass
+    def _strains(self, worksheet, bold_сell_format, cell_format, left_format):
+        worksheet.merge_range(0, self.len3, 0, self.len3+2, "Доля переболевших", bold_сell_format)
+        worksheet.set_column(0, self.len3, 10)
+        worksheet.set_column(0, self.len3+1, 10)
+        
+        for i in range(self.len):
+            worksheet.merge_range(i+1, self.len3, i+1, self.len3+1, self.labels[i], left_format)
+            worksheet.write(i+1, self.len3+2, self.exposed_values[i], cell_format)
+
+        virul = ['A(H1N1)', 'A(H3N2)', 'B']
+        worksheet.merge_range(self.len+2, self.len3, self.len+2, self.len3+1, "Вирулентность", bold_сell_format)
+        for i in range(3):
+            worksheet.write(self.len+3+i, self.len3, virul[i], left_format)
+            worksheet.write(self.len+3+i, self.len3+1, self.lambda_values[i], cell_format)
+            
+
+            
     
-    def _strain(self):
-        pass
+    def _strain(self, worksheet, bold_сell_format, cell_format, left_format):
+        worksheet.merge_range(0, self.len3, 0, self.len3+1, "Доля переболевших", bold_сell_format)
+        worksheet.set_column(0, self.len3, 10)
+        worksheet.set_column(0, self.len3+1, 10)
+        
+        for i in range(self.len):
+            worksheet.write(i+1, self.len3, self.labels[i], cell_format)
+            worksheet.write(i+1, self.len3+1, self.exposed_values[i], cell_format)
+
+        worksheet.merge_range(self.len+2, self.len3, self.len+2, self.len3+1, "Вирулентность", bold_сell_format)
+        worksheet.merge_range(self.len+3, self.len3, self.len+3, self.len3+1, self.lambda_values[0], cell_format)
+            
+
+
+
+
+
+
+
+
+
+
