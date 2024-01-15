@@ -41,6 +41,7 @@ import signal
 from optimizers import multiple_model_fit
 from dash.exceptions import PreventUpdate
 
+from toTable.toExcel import toExcel
 
 cache = diskcache.Cache("./cache")
 long_callback_manager = DiskcacheLongCallbackManager(cache)
@@ -53,7 +54,7 @@ app = DashProxy(__name__,
 app._favicon = ("favicon.ico")
 app.layout = layout
 PRESET_MODE = False
-
+_GENERATE = None
 
 @app.callback(
     [Output('exposed-accordion-item', 'children', allow_duplicate=True),
@@ -197,11 +198,8 @@ def update_graph(_, incidence, exposed_values,
     epid_data.index = epid_data.reset_index().index + delta
     m, n = epid_data.index[0], epid_data.index[-1]
     last_simul_ind = n + 5
-    print("Last simul index:", last_simul_ind)
 
     xticks_vals, xticks_text = generate_xticks(epid_data, year, last_simul_ind)
-    print(xticks_vals)
-    print(xticks_text)
     pos_x = xticks_vals[xticks_vals['year'] == year].index[-1]
 
     r_squared = r2_score(epid_data[groups], simul_weekly.iloc[delta:epid_data.index[-1] + 1, :],
@@ -212,7 +210,14 @@ def update_graph(_, incidence, exposed_values,
               else group.replace('15 и ст.', '15+') for group in groups]
 
     y0_rect = 0
+    Data = []
+    Predict = []
     for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
+        D = [0]*(delta) + list(epid_data[group])
+        P = list(round(simul_weekly[group][:last_simul_ind],0))
+        D += [0]*(len(P) - len(D))
+        Data.append(D)
+        Predict.append(P)
 
         y0_rect = max(y0_rect, max(
             simul_weekly[group][:last_simul_ind]), max(epid_data[group]))
@@ -253,7 +258,8 @@ def update_graph(_, incidence, exposed_values,
                                  "family": "Times New Roman"},
                            bgcolor="rgb(255, 255, 255)",
                            opacity=0.8)
-
+    global _GENERATE
+    _GENERATE = toExcel(incidence, exposed_values, lambda_values, labels, Data, Predict)
     model_y = {"total": 0.845, "strain_age-group": 0.13,
                "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
@@ -338,11 +344,12 @@ def update_graph(_, incidence, exposed_values,
     fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
-    return fig
+    return fig, False
 
 
 @app.callback(
     Output('model-fit', 'figure'),
+    Output('excel-button', 'disabled'),
     Input('forecast-button', 'n_clicks'),
     State('incidence', 'value'),
 
@@ -395,14 +402,6 @@ def update_graph_predict(_, incidence, exposed_values,
 
     ds_amount = int(100 / len(simul_weekly.columns))
 
-    '''
-    print(epid_data.loc[:, simul_weekly.columns])
-    print(simul_weekly.dropna(axis=1))
-    print(ds_amount)
-    print(sample_size)
-    print(inflation_parameter)
-    print(last_simul_ind)
-    '''
 
     predict_gates_generator = PredictGatesGenerator(epid_data.loc[:, simul_weekly.columns],
                                                     simul_weekly.dropna(
@@ -432,7 +431,15 @@ def update_graph_predict(_, incidence, exposed_values,
     y0_rect = 0
     x0_start = float('inf')
     x1_end = 0
+    Data = []
+    Predict = []
     for i, (group, label) in enumerate(zip(simul_weekly.columns, labels)):
+        D = [0]*(delta) + list(epid_data[group][:sample_size])
+        P = list(round(simul_weekly[group][:last_simul_ind],0))
+        D += [0]*(len(P) - len(D))
+        Data.append(D)
+        Predict.append(P)
+
         y0_rect = max(y0_rect, max(
             simul_weekly[group][:last_simul_ind]), max(epid_data[group]))
         x0_start = min(x0_start, epid_data[group][:sample_size].index[0])
@@ -682,8 +689,25 @@ def update_graph_predict(_, incidence, exposed_values,
 
     fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
-    return fig
+    return fig, False
 
+@app.callback(
+    Input('excel-button', 'n_clicks'),
+
+    Output('model-fit', 'figure', allow_duplicate=True),
+
+    prevent_initial_call=True,
+)
+def excel_create(_):
+    
+    global _GENERATE
+    _GENERATE.generate()
+    
+    time.sleep(3)   
+
+    if True:
+        raise PreventUpdate
+    return 0
 
 @app.callback(Input("ci-button", "n_clicks"),
               Output("download-ci-request-json", "data"),
@@ -876,7 +900,6 @@ def launch_calibration(_, incidence, exposed_values,
     'total_recovered': [483795.443701321], 
     'R2': [0.5166538711970509], 
     'r0': [[3.7383068917701014]]}'''
-    print(incidence)
     # incidence - уровень детализации из вкладки данные
     # exposed_values - значения "Доля переболевших"
     # lambda_values - значения "Вирулентность"
