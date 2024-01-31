@@ -23,7 +23,8 @@ cities = [html.P('Город', style={'margin': '20px 20px'}),
 
 years = [html.P('Год', style={'margin': '20px 0px 10px 0px'}),
          dcc.Dropdown(options=['2010', '2011', '2012', '2013', '2014',
-                               '2015', '2016', '2017', '2018', '2019'],
+                               '2015', '2016', '2017', '2018', '2019',
+                               '2020', '2021', '2022', '2023'],
                       value='2010',
                       id='year',
                       clearable=False)]
@@ -205,6 +206,27 @@ preset_components = html.Div([
     html.Div(id='output-data-upload')
 ])
 
+source_components = html.Div([
+    dcc.Upload(id="upload-source",
+               children=html.Div(["Загрузите данные или ",
+                                  html.A("выберите файл",
+                                         href="javascript:void(0);"),
+                                  " в формате excel"]),
+               style={
+                   'width': '100%',
+                   'height': '60px',
+                   'lineHeight': '60px',
+                   'borderWidth': '1px',
+                   'borderStyle': 'dashed',
+                   'borderRadius': '5px',
+                   'textAlign': 'center',
+                   'margin': '10px'
+               },
+               multiple=False,
+               accept='.xlsx'),
+    html.Div(id='output-source-upload')
+])
+
 documentation = html.Div(
     [html.Div('Инструкция',
               style={'textAlign': 'center', 'fontSize': 20, 'font-weight': 'bold'}),
@@ -254,7 +276,7 @@ upper_row = \
                             label='Параметры модели', id='model-components'),
                     dbc.Tab([data_components], label='Данные',
                             id='data-components'),
-                    dbc.Tab([preset_components], label='Пресеты',
+                    dbc.Tab([preset_components, source_components], label='Пресеты',
                             id='preset-components'),
                     dbc.Tab([documentation], label='Инструкция',
                             id='documentation'),

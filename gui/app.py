@@ -1,5 +1,6 @@
 from flask import send_from_directory
 import base64
+import io
 import json
 import datetime
 import pickle
@@ -26,7 +27,7 @@ import bulletin.bulletin_generator as bulletin_generator
 import calibration
 import time
 import os
-
+from data import excel_preprocessing
 
 import diskcache
 from utils.experiment_setup import ExperimentalSetup
@@ -41,6 +42,9 @@ import signal
 from optimizers import multiple_model_fit
 from dash.exceptions import PreventUpdate
 
+import update_values
+import pandas as pd
+
 
 cache = diskcache.Cache("./cache")
 long_callback_manager = DiskcacheLongCallbackManager(cache)
@@ -54,6 +58,8 @@ app._favicon = ("favicon.ico")
 app.layout = layout
 PRESET_MODE = False
 
+
+# UPDATING COMPONENTS
 
 @app.callback(
     [Output('exposed-accordion-item', 'children', allow_duplicate=True),
@@ -200,8 +206,6 @@ def update_graph(_, incidence, exposed_values,
     print("Last simul index:", last_simul_ind)
 
     xticks_vals, xticks_text = generate_xticks(epid_data, year, last_simul_ind)
-    print(xticks_vals)
-    print(xticks_text)
     pos_x = xticks_vals[xticks_vals['year'] == year].index[-1]
 
     r_squared = r2_score(epid_data[groups], simul_weekly.iloc[delta:epid_data.index[-1] + 1, :],
@@ -242,17 +246,17 @@ def update_graph(_, incidence, exposed_values,
                                  line_shape='spline',
                                  name=label))
 
-    for i, r2 in enumerate(r_squared):
-        fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
-                           showarrow=False,
-                           xanchor='left',
-                           xref='paper',
-                           x=0.03,
-                           yshift=i * (-25) + 405,
-                           font={'color': colors[i], 'size': 60,
-                                 "family": "Times New Roman"},
-                           bgcolor="rgb(255, 255, 255)",
-                           opacity=0.8)
+    # for i, r2 in enumerate(r_squared):
+    #     fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
+    #                        showarrow=False,
+    #                        xanchor='left',
+    #                        xref='paper',
+    #                        x=0.03,
+    #                        yshift=i * (-25) + 405,
+    #                        font={'color': colors[i], 'size': 60,
+    #                              "family": "Times New Roman"},
+    #                        bgcolor="rgb(255, 255, 255)",
+    #                        opacity=0.8)
 
     model_y = {"total": 0.845, "strain_age-group": 0.13,
                "strain": 0.73, "age-group": 0.785}
@@ -264,7 +268,7 @@ def update_graph(_, incidence, exposed_values,
         height=700,
         margin={'l': 85, 'r': 40, 'b': 65, 't': 60, 'pad': 0},
         title={
-            'text': f"{cities[city]}, {year}-{year + 1} гг.",
+            'text': f"Российская Федерация, {year}-{year + 1} гг.",
             'font': {'size': 40},
             "font_family": "Times New Roman",
             'xanchor': 'center',
@@ -335,7 +339,7 @@ def update_graph(_, incidence, exposed_values,
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
     # ось у
-    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+    fig.update_yaxes(title_text="Количество случаев заболевания, в тыс.", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
     return fig
@@ -391,7 +395,7 @@ def update_graph_predict(_, incidence, exposed_values,
 
     epid_data.index = epid_data.reset_index().index + delta
     m, n = epid_data.index[0], epid_data.index[-1]
-    last_simul_ind = n + 15
+    last_simul_ind = n + 20
 
     ds_amount = int(100 / len(simul_weekly.columns))
 
@@ -459,7 +463,7 @@ def update_graph_predict(_, incidence, exposed_values,
                                  line={'dash': 'dash', 'shape': 'spline',
                                        'color': f'rgba{(*hex_to_rgb(colors[i])  , 0.5)}'},
                                  marker={'color': colors[i], 'size': 10, },
-                                 name=label))
+                                 name="ВСЕ ВОЗРАСТЫ"))
 
         # # points of predict - NO NEED TO SHOW, actually we do not know them
         # fig.add_trace(go.Scatter(x=epid_data[group][sample_size:].index,
@@ -485,7 +489,7 @@ def update_graph_predict(_, incidence, exposed_values,
                                  mode='lines',
                                  showlegend=False,
                                  marker={'color': colors[i], 'size': 10},
-                                 name=label))
+                                 name="ВСЕ ВОЗРАСТЫ"))
 
         pr_m = m + sample_size - 1
         pr_n = m + sample_size + forecast_term
@@ -521,20 +525,20 @@ def update_graph_predict(_, incidence, exposed_values,
 
             fig.add_trace(go.Scatter(x=x_, y=y2_, fill='tonexty', fillcolor=f'rgba{(*hex_to_rgb(colors[i]), 0.3)}',
                                      mode='lines',
-                                     name=f"(PR: {percentiles[gate_i][0]}-{percentiles[gate_i][1]}), {label}",
+                                     name=f"ВСЕ ВОЗРАСТЫ",
                                      marker={'color': f'rgba{(*hex_to_rgb(colors[i]), 0.3)}', 'size': 10}))
 
-    for i, r2 in enumerate(r_squared):
-        fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
-                           showarrow=False,
-                           xanchor='left',
-                           xref='paper',
-                           x=0.03,
-                           yshift=i * (-25) + 300,
-                           font={'color': colors[i], 'size': 18,
-                                 "family": "Courier New, monospace"},
-                           bgcolor="rgb(255, 255, 255)",
-                           opacity=0.8)
+    # for i, r2 in enumerate(r_squared):
+    #     fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
+    #                        showarrow=False,
+    #                        xanchor='left',
+    #                        xref='paper',
+    #                        x=0.03,
+    #                        yshift=i * (-25) + 300,
+    #                        font={'color': colors[i], 'size': 18,
+    #                              "family": "Courier New, monospace"},
+    #                        bgcolor="rgb(255, 255, 255)",
+    #                        opacity=0.8)
 
     model_y = {"total": 0.845, "strain_age-group": 0.125,
                "strain": 0.73, "age-group": 0.785}
@@ -546,7 +550,7 @@ def update_graph_predict(_, incidence, exposed_values,
         height=700,
         margin={'l': 85, 'r': 40, 'b': 65, 't': 60, 'pad': 0},
         title={
-            'text': f"{cities[city]}, {year}-{year + 1} гг.",
+            'text': f"Российская Федерация, {year}-{year + 1} гг.",
             'font': {'size': 40},
             "font_family": "Times New Roman",
             'xanchor': 'center',
@@ -680,7 +684,7 @@ def update_graph_predict(_, incidence, exposed_values,
     fig.update_xaxes(title_text="Номер недели в году", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
-    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+    fig.update_yaxes(title_text="Количество случаев заболевания, в тыс.", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
     return fig
 
@@ -771,7 +775,7 @@ def bulletin_client_call(_, incidence, exposed_values,
 def process_preset(list_of_contents, list_of_names, list_of_dates):
     incidence_default = "age-group"
     city_default = 'spb'
-    year_default = '2010'
+    year_default = '2023'
 
     component_bunch = age_groups_comps.get_multi_age_c()
 
@@ -815,6 +819,28 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
             get_model_params_components(
                 component_bunch, a_default, mu_default, delta_default)
             .children[0].children)
+
+
+def parse_contents(contents):
+    _, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    df = pd.read_excel(io.BytesIO(decoded))
+    return df
+
+
+@app.callback(Output('output-data-upload', 'children'),
+              Input('upload-source', 'contents'),
+              State('upload-preset', 'filename'),
+              State('upload-preset', 'last_modified'),
+              prevent_initial_call=True,
+              )
+def process_upload_data(contents, list_of_names, list_of_dates):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    df = pd.read_excel(io.BytesIO(decoded), skiprows=[0])
+    excel_preprocessing.preprocess_excel_source(df)
+    children = ""
+    return children
 
 
 @app.callback(
@@ -887,7 +913,7 @@ def launch_calibration(_, incidence, exposed_values,
     current_time = str(datetime.datetime.now())
 
     calibration_parameters = calibration.calibration(
-        year=year, mu=mu, incidence=incidence)
+        year=year, mu=mu, incidence=incidence, sample_size=sample_size)
     # calibration_parameters = {'exposed': [0.30148313273350635],
     # 'incidence': 'total',
     # 'lambda': [0.09544288428775363],
