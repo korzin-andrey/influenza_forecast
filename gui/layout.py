@@ -162,9 +162,15 @@ buttons = \
         Col([
             html.Div([
                 dbc.ButtonGroup([
-                    dbc.Button('Запустить калибровку',
-                               id='calibration-button'),
-                    dcc.Download(id="download-preset"),
+                    dbc.Button([
+                        html.Div(
+                            dbc.Spinner(
+                                dcc.Download(id="download-preset"), 
+                                size="lg", color='#ADFF2F'
+                            ), style={"position": "relative", "top": "50%"}
+                        ), "Остановить калибровку"
+                    ], id='calibration-button'),
+                    
                     dbc.Button('Остановить калибровку',
                                id='calibration-button-stop', disabled=True),
                     dbc.Button('Запустить моделирование',
@@ -183,7 +189,7 @@ buttons = \
                     #     dbc.Button('Генерация бюллетеня', id='ci-button'),
                     #     dcc.Download(id="download-ci-request-json")],)
                 ], className='buttons-group')
-            ], style={'margin': '20px 60px 0px 0px'})
+            ], style={'margin': '20px 60px 0px 0px', "height":"15%"})
         ])
     ], justify='center')
 
