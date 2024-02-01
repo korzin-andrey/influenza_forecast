@@ -34,4 +34,5 @@ setup(name='uq_influenza_modeling',
                         'jupyter',
                         'joblib',
                         'jsonpickle',
-                        'wheel'])
+                        'wheel',
+                        'XlsxWriter'])

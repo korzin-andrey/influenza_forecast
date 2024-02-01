@@ -170,6 +170,8 @@ buttons = \
                     dbc.Button('Запустить моделирование',
                                id='forecast-button'),
                     dbc.Button('Сохранить график', id='save_plot-button'),
+                    dbc.Button('Создать таблицу',
+                               id='excel-button', disabled=True),
                     # dbc.Button('Построить прогноз', id='forecast-button'),
                     #             dcc.Loading(
                     #     id="loading",
