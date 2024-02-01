@@ -22,7 +22,7 @@ from aux_functions import prepare_exposed_list, get_data_and_model, transform_da
     exposed_dict_to_inputs, lambda_dict_to_inputs
 from bootstrapping.predict_gates import PredictGatesGenerator
 from components import multi_strain, multi_age, multi_strain_age, total_c
-from layout import layout, get_model_params_components, get_data_components
+from layout import layout, get_model_params_components, get_data_components, get_model_advance_params
 import bulletin.bulletin_generator as bulletin_generator
 import calibration
 import time
@@ -62,7 +62,6 @@ _GENERATE = None
 
 # UPDATING COMPONENTS
 
-
 @app.callback(
     [Output('exposed-accordion-item', 'children', allow_duplicate=True),
      Output('lambda-accordion-item', 'children', allow_duplicate=True)],
@@ -90,78 +89,148 @@ def update_components(incidence):
 
 @app.callback(
     [Output({'type': 'exposed', 'index': ALL}, 'value'),
-     Output({'type': 'lambda', 'index': ALL}, 'value'),
      Output({'type': 'exposed_io', 'index': ALL}, 'value'),
-     Output({'type': 'lambda_io', 'index': ALL}, 'value')],
+     Output({'type': 'exposed', 'index': ALL}, 'min'),
+     Output({'type': 'exposed', 'index': ALL}, 'max'),
+     Output({'type': 'exposed', 'index': ALL}, 'marks')],
 
     [Input({'type': 'exposed_io', 'index': ALL}, 'value'),
-     Input({'type': 'lambda_io', 'index': ALL}, 'value'),
-     Input({'type': 'exposed', 'index': ALL}, 'value'),
+     Input({'type': 'exposed', 'index': ALL}, 'value')],
+    prevent_initial_call=True
+)
+def update_exposed(exposed_io, exposed):
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if "io" in trigger_id:
+        exposed = exposed_io
+    else:
+        exposed_io = exposed
+
+    min_ = [round(i-0.0005,4) for i in exposed]
+    max_ = [round(i+0.0005,4) for i in exposed]
+    marks = [{min_[i]: f'{min_[i]}', max_[i]: f'{max_[i]}'} for i in range(len(min_))]
+    return exposed, exposed_io, min_, max_, marks
+
+@app.callback(
+    [Output({'type': 'lambda', 'index': ALL}, 'value'),
+     Output({'type': 'lambda_io', 'index': ALL}, 'value'),
+     Output({'type': 'lambda', 'index': ALL}, 'min'),
+     Output({'type': 'lambda', 'index': ALL}, 'max'),
+     Output({'type': 'lambda', 'index': ALL}, 'marks')],
+
+    [Input({'type': 'lambda_io', 'index': ALL}, 'value'),
      Input({'type': 'lambda', 'index': ALL}, 'value')],
     prevent_initial_call=True
 )
-def update_exposed_and_lambda(exposed_io, lambda_io, exposed, lambda_):
+def update_lambda(lambda_io, lambda_):
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-    if "exposed" in trigger_id:
-        if "io" in trigger_id:
-            exposed = exposed_io
-        else:
-            exposed_io = exposed
+    if "io" in trigger_id:
+        lambda_ = lambda_io
     else:
-        if "io" in trigger_id:
-            lambda_ = lambda_io
-        else:
-            lambda_io = lambda_
+        lambda_io = lambda_
 
-    return exposed, lambda_, exposed_io, lambda_io
-
+    min_ = [round(i-0.00005,5) for i in lambda_]
+    max_ = [round(i+0.00005,5) for i in lambda_]
+    marks = [{min_[i]: f'{min_[i]}', max_[i]: f'{max_[i]}'} for i in range(len(min_))]
+    return lambda_, lambda_io, min_, max_, marks
 
 @app.callback(
     [Output('a', 'value'),
-     Output('mu', 'value'),
-     Output('delta', 'value'),
+     Output('a_io', 'value'),
+     Output('a', 'min'),
+     Output('a', 'max'),
+     Output('a', 'marks')],
+
+    [Input('a_io', 'value'),
+     Input('a', 'value')],
+    prevent_initial_call=True
+)
+def update_a(a_io, a):
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if "io" in trigger_id:
+        a = a_io
+    else:
+        a_io = a
+
+    min_ = round(a-0.0005,5)
+    max_ = round(a+0.0005,5)
+    print(min_, max_)
+    marks = {min_: f'{min_}', max_: f'{max_}'}
+    return a_io, a, min_, max_, marks
+
+@app.callback(
+    [Output('mu', 'value'),
+     Output('mu_io', 'value'),
+     Output('mu', 'min'),
+     Output('mu', 'max'),
+     Output('mu', 'marks')],
+
+    [Input('mu_io', 'value'),
+     Input('mu', 'value')],
+    prevent_initial_call=True
+)
+def update_mu(mu_io, mu):
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if "io" in trigger_id:
+        mu = mu_io
+    else:
+        mu_io = mu
+
+    min_ = round(mu-0.0005,5)
+    max_ = round(mu+0.0005,5)
+    print(min_, max_)
+    marks = {min_: f'{min_}', max_: f'{max_}'}
+    return mu_io, mu, min_, max_, marks
+
+@app.callback(
+    [Output('delta', 'value'),
      Output('sample', 'value'),
      Output('forecast-term', 'value'),
      Output('inflation-parameter', 'value')],
-    [CycleBreakerInput('a_io', 'value'),
-     CycleBreakerInput('mu_io', 'value'),
-     CycleBreakerInput('delta_io', 'value'),
+    [CycleBreakerInput('delta_io', 'value'),
      CycleBreakerInput('sample_io', 'value'),
      CycleBreakerInput('forecast-term_io', 'value'),
      CycleBreakerInput('inflation-parameter_io', 'value')],
     prevent_initial_call=True
 )
-def update_sliders(a_io, mu_io, delta_io, sample_io, forecast_term_io, inflation_parameter_io):
+def update_sliders(delta_io, sample_io, forecast_term_io, inflation_parameter_io):
     """
     Returns values to the all slider components from the all input components
     (1st callback of the mutually dependent components: sliders and inputs)
     """
-    return [a_io, mu_io, delta_io, sample_io, forecast_term_io, inflation_parameter_io]
+    return [delta_io, sample_io, forecast_term_io, inflation_parameter_io]
 
 
 @app.callback(
-    [Output('a_io', 'value'),
-     Output('mu_io', 'value'),
-     Output('delta_io', 'value'),
+    [Output('delta_io', 'value'),
      Output('sample_io', 'value'),
      Output('forecast-term_io', 'value'),
      Output('inflation-parameter_io', 'value')],
-    [Input('a', 'value'),
-     Input('mu', 'value'),
-     Input('delta', 'value'),
+    [Input('delta', 'value'),
      Input('sample', 'value'),
      Input('forecast-term', 'value'),
      Input('inflation-parameter', 'value')],
     prevent_initial_call=True
 )
-def update_inputs(a, mu, delta, sample, forecast_term, inflation_parameter):
+def update_inputs(delta, sample, forecast_term, inflation_parameter):
     """
     Returns values to the all input components from the all slider components
     (2nd callback of the mutually dependent components: sliders and inputs)
     """
-    return [a, mu, delta, sample, forecast_term, inflation_parameter]
+    return [delta, sample, forecast_term, inflation_parameter]
 
+@app.callback(
+    Output("offcanvas", "is_open"),
+    Input("advance_setting", "n_clicks"),
+    [State("offcanvas", "is_open")],
+)
+def toggle_offcanvas(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 # @app.callback(
 #     Output('model-fit', 'figure', allow_duplicate=True),
@@ -801,10 +870,12 @@ def bulletin_client_call(_, incidence, exposed_values,
 @app.callback([Output('data_components', 'children', allow_duplicate=True),
                Output('city', 'value', allow_duplicate=True),
                Output('year', 'value', allow_duplicate=True),
-               Output('params-components', 'children', allow_duplicate=True)],
+               Output('params-components', 'children'),
+               Output('params-components-advance', 'children')],
               Input('upload-preset', 'contents'),
               State('upload-preset', 'filename'),
               State('upload-preset', 'last_modified'),
+              prevent_initial_call=True
               )
 def process_preset(list_of_contents, list_of_names, list_of_dates):
     incidence_default = "total"
@@ -849,10 +920,10 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
             raise ValueError(f"can't parse incidence: {incidence_default}")
 
     return (get_data_components(incidence_default).children,
-            city_default, year_default,
-            get_model_params_components(
-                component_bunch, a_default, mu_default, delta_default)
-            .children[0].children)
+            city_default, 
+            year_default,
+            get_model_params_components(component_bunch, a_default, mu_default).children,
+            get_model_advance_params(delta_default).children)
 
 
 def parse_contents(contents):

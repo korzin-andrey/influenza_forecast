@@ -4,13 +4,17 @@ from dash_bootstrap_components import Row, Col
 
 
 def get_exposed_sliders(exposed=(0.6081385649385342,)):
-    return dcc.Slider(min=0, max=1, marks={0: '0', 1: '1'},
+    _min = round(exposed[0]-0.0005, 4)
+    _max = round(exposed[0]+0.0005, 4)
+    return dcc.Slider(min=_min, max=_max, step=0.0001, marks={_min: f'{_min}', _max: f'{_max}'},
                       id={'type': 'exposed', 'index': 0},
                       tooltip={"placement": "bottom"}, value=exposed[0])
 
 
 def get_lambda_sliders(lambda_=(0.16707651314610894,)):
-    return dcc.Slider(min=0, max=1, marks={0: '0', 1: '1'},
+    _min = round(lambda_[0]-0.00005, 5)
+    _max = round(lambda_[0]+0.00005, 5)
+    return dcc.Slider(min=_min, max=_max, step=0.00001, marks={_min: f'{_min}', _max: f'{_max}'},
                       id={'type': 'lambda', 'index': 0},
                       tooltip={"placement": "bottom"}, value=lambda_[0])
 
