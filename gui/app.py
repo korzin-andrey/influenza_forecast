@@ -34,20 +34,11 @@ from utils.experiment_setup import ExperimentalSetup
 from aux_functions import get_contact_matrix, prepare_calibration_data, get_config
 from optimizers.multiple_model_fit import MultipleModelFit
 from dash.long_callback import DiskcacheLongCallbackManager
-
 import dash
 import plotly.io as pio
-
 import signal
 from optimizers import multiple_model_fit
 from dash.exceptions import PreventUpdate
-
-import gui.update_callbacks as update_callbacks
-import pandas as pd
-from update_callbacks import get_update_callbacks
-from plot_callbacks import get_plot_callbacks
-from calibration_callbacks import get_calibration_callbacks
-
 import gui.update_callbacks as update_callbacks
 import pandas as pd
 from update_callbacks import get_update_callbacks
@@ -201,9 +192,6 @@ def update_graph(_, incidence, exposed_values,
     exposed_list = prepare_exposed_list(incidence, exposed_list)
 
     epid_data, model_obj, groups = get_data_and_model(mu, incidence, year)
-
-    if sample_size < len(epid_data.index):
-        epid_data = epid_data[:sample_size]
 
     model_obj.init_simul_params(
         exposed_list=exposed_list, lam_list=lam_list, a=a_list)
@@ -404,7 +392,7 @@ def update_graph_predict(_, incidence, exposed_values,
     exposed_list = prepare_exposed_list(incidence, exposed_list)
 
     epid_data, model_obj, groups = get_data_and_model(mu, incidence, year)
-    if sample_size > len(epid_data.index):
+    if sample_size >= len(epid_data.index):
         return update_graph(_, incidence, exposed_values,
                             lambda_values, a, mu, delta, sample_size, city, year)
 
@@ -819,7 +807,7 @@ def bulletin_client_call(_, incidence, exposed_values,
               State('upload-preset', 'last_modified'),
               )
 def process_preset(list_of_contents, list_of_names, list_of_dates):
-    incidence_default = "age-group"
+    incidence_default = "total"
     city_default = 'spb'
     year_default = '2023'
 
@@ -1024,7 +1012,7 @@ def save_plot(_, incidence, exposed_values,
     epid_data, model_obj, groups = get_data_and_model(mu, incidence, year)
     if sample_size > len(epid_data.index):
         fig = update_graph(_, incidence, exposed_values,
-                           lambda_values, a, mu, delta, sample_size, city, year)
+                           lambda_values, a, mu, delta, sample_size, city, year)[0]
 
     else:
         fig = update_graph_predict(_, incidence, exposed_values,

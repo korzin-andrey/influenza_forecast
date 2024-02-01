@@ -32,16 +32,18 @@ years = [html.P('Год', style={'margin': '20px 0px 10px 0px'}),
 
 def get_incidence_type(default):
     return [html.P('Уровень детализированности', style={'margin': '20px 0px 10px 0px'}),
-            dcc.Dropdown(options=[{'label': 'возрастные группы', 'value': 'age-group'},
-                                  {'label': 'штаммы', 'value': 'strain'},
-                                  {'label': 'возрастные группы и штаммы',
-                                      'value': 'strain_age-group'},
-                                  {'label': 'агрегированные данные', 'value': 'total'}],
-                         value=default, id='incidence', clearable=False)]
+            dcc.Dropdown(options=[
+                # {'label': 'возрастные группы', 'value': 'age-group'},
+                #   {'label': 'штаммы', 'value': 'strain'},
+                #   {'label': 'возрастные группы и штаммы',
+                #   'value': 'strain_age-group'},
+                {'label': 'агрегированные данные', 'value': 'total'}],
+        value=default, id='incidence', clearable=False)]
 
 
 def get_data_components(incidence_type_init):
     return Row([
+        # yet without cities, only country
         Col([*cities], md=3),
         Col([*years, *get_incidence_type(incidence_type_init)], md=4)
     ], id='data_components', justify='left')
@@ -165,12 +167,12 @@ buttons = \
                     dbc.Button([
                         html.Div(
                             dbc.Spinner(
-                                dcc.Download(id="download-preset"), 
+                                dcc.Download(id="download-preset"),
                                 size="lg", color='#ADFF2F'
                             ), style={"position": "relative", "top": "50%"}
                         ), "Остановить калибровку"
                     ], id='calibration-button'),
-                    
+
                     dbc.Button('Остановить калибровку',
                                id='calibration-button-stop', disabled=True),
                     dbc.Button('Запустить моделирование',
@@ -189,7 +191,7 @@ buttons = \
                     #     dbc.Button('Генерация бюллетеня', id='ci-button'),
                     #     dcc.Download(id="download-ci-request-json")],)
                 ], className='buttons-group')
-            ], style={'margin': '20px 60px 0px 0px', "height":"15%"})
+            ], style={'margin': '20px 60px 0px 0px', "height": "15%"})
         ])
     ], justify='center')
 

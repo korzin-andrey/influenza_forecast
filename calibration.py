@@ -13,7 +13,7 @@ from visualization.visualization import plot_fitting, plot_immune_population, pl
 from utils.utils import get_config, save_results, save_epid_result, save_preset
 
 
-def calibration(year, mu, incidence):
+def calibration(year, mu, incidence, sample_size):
     config = get_config('config.yaml')
 
     path = config['data_path']
@@ -23,7 +23,6 @@ def calibration(year, mu, incidence):
 
     age_groups = config['age_groups']
     strains = config['strains']
-
 
     data_detail = config['DATA_DETAIL']
     model_detail = config['MODEL_DETAIL']
@@ -38,21 +37,25 @@ def calibration(year, mu, incidence):
                                                        strains, exposure_year)
 
     # Calibration
-    experiment_setter = ExperimentalSetup(incidence, age_groups, strains, contact_matrix, pop_size, mu, sigma)
+    experiment_setter = ExperimentalSetup(
+        incidence, age_groups, strains, contact_matrix, pop_size, mu, sigma)
 
     num_iter_fit = 1  # os.cpu_count() - 1  # amount of re-calibrations to obtain best-fit model
 
     optimizer = experiment_setter.setup_experiment(epidemic_data, model_detail)
 
-    multiple_model_fit = MultipleModelFit.from_optimizer(optimizer, num_iter_fit)
+    multiple_model_fit = MultipleModelFit.from_optimizer(
+        optimizer, num_iter_fit)
 
-    sample_size = 8
-    fitting_params = {"predict": predict, "sample_size": sample_size} if predict else {}
+    fitting_params = {"predict": predict,
+                      "sample_size": sample_size} if predict else {}
 
-    optimizer, opt_parameters = multiple_model_fit.get_models_best_fit(**fitting_params)[0]
+    optimizer, opt_parameters = multiple_model_fit.get_models_best_fit(
+        **fitting_params)[0]
 
     print("Calibration finished")
     return opt_parameters
+
 
 if __name__ == '__main__':
     calibration()
