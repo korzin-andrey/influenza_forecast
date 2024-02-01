@@ -280,10 +280,6 @@ def update_graph(_, incidence, exposed_values,
     _GENERATE = toExcel(incidence, exposed_values,
                         lambda_values, labels, Data, Predict)
 
-    global _GENERATE
-    _GENERATE = toExcel(incidence, exposed_values,
-                        lambda_values, labels, Data, Predict)
-
     model_y = {"total": 0.845, "strain_age-group": 0.13,
                "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
