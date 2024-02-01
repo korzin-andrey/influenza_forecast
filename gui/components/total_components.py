@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import dcc
 from dash_bootstrap_components import Row, Col
-from math import ceil
+
 
 def get_exposed_sliders(exposed=(0.6081385649385342,)):
     _min = round(exposed[0]-0.0005, 4)

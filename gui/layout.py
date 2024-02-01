@@ -3,10 +3,7 @@ from dash import html, dcc
 from dash_bootstrap_components import Row, Col
 
 from components import total_c
-#################################
-#from components import multi_age
-#################################
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ВСЕ РАВНО ПОЯВЛЯЕТСЯ AGE
+
 mode_bar_buttons_to_remove = ['autoScale2d',
                               'pan2d', 'zoom2d', 'select2d', 'lasso2d']
 config = dict(displaylogo=False, responsive=True,
