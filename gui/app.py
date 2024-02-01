@@ -42,8 +42,11 @@ import signal
 from optimizers import multiple_model_fit
 from dash.exceptions import PreventUpdate
 
-import update_values
+import gui.update_callbacks as update_callbacks
 import pandas as pd
+from update_callbacks import get_update_callbacks
+from plot_callbacks import get_plot_callbacks
+from calibration_callbacks import get_calibration_callbacks
 
 
 cache = diskcache.Cache("./cache")

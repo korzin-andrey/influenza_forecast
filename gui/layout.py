@@ -188,8 +188,7 @@ buttons = \
 preset_components = html.Div([
     dcc.Upload(id="upload-preset",
                children=html.Div(["Перетащите или ",
-                                  html.A("выберите файл",
-                                         href="javascript:void(0);"),
+                                  html.A("выберите файл"),
                                   " в формате JSON"]),
                style={
                    'width': '100%',
@@ -209,8 +208,7 @@ preset_components = html.Div([
 source_components = html.Div([
     dcc.Upload(id="upload-source",
                children=html.Div(["Загрузите данные или ",
-                                  html.A("выберите файл",
-                                         href="javascript:void(0);"),
+                                  html.A("выберите файл"),
                                   " в формате excel"]),
                style={
                    'width': '100%',
