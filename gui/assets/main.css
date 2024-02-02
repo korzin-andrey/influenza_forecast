@@ -49,7 +49,7 @@ body {
     }
 
     #detail{
-        margin: 7px 0px 10px 0px;
+        margin: 6px 0px 10px 0px;
         text-align: center;
     }
 
@@ -90,14 +90,13 @@ body {
 }
 
 @media (max-width:1220px) {
-  /* your conditional / responsive CSS inside this condition */
     body {
         height: 900px;
         padding-top: 0px
     }
 
     #detail{
-        margin: 7px 0px 5px 0px;
+        margin: 6px 0px 5px 0px;
         text-align: center;
     }
 
@@ -116,28 +115,15 @@ body {
     }
 }
 
-@media (max-width:991) {
-  /* your conditional / responsive CSS inside this condition */
-    body {
-        height: 900px;
-        padding-top: 0px
-    }
-
-    #detail{
-        text-align: center;
-    }
-
-}
 
 @media (max-width: 813px) {
-  /* your conditional / responsive CSS inside this condition */
     body {
         height: 765px;
         padding-top: 0px
     }
 
     #detail{
-        margin: 7px 0px 5px 0px;
+        margin: 6px 0px 5px 0px;
         text-align: center;
     }
 
