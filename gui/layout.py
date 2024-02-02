@@ -18,7 +18,7 @@ cities = [html.P('География', style={'margin': '20px 20px'}),
                                   ],
                          value='spb',
                          inputStyle={"marginRight": "10px",
-                                     "marginLeft": "15px"},
+                                     "marginLeft": "5px"},
                          style={'margin': '10px 0px'},
                          id='city')]
 
@@ -53,9 +53,9 @@ def get_data_components(incidence_type_init):
 
 def get_data_components(incidence_type_init):
     return Row([
-        Col([*cities], md=3),
-        Col([*years], md=4, id='yearCol'),
-        Col([*get_incidence_type(incidence_type_init)], md=5)
+        Col([*cities], lg=3, width=4, id="geoCol"),
+        Col([*years], lg=4, width=4, id='yearCol'),
+        Col([*get_incidence_type(incidence_type_init)], lg=5, width=4, id='incidenceCol')
     ], id='data_components', justify='left')
 
 data_components = get_data_components('total')
@@ -226,15 +226,15 @@ buttons = \
                                 dcc.Download(id="download-preset"),
                                 size="lg", color='#ADFF2F'
                             ), style={"position": "relative", "top": "50%"}
-                        ), "Запустить калибровку"
+                        ), html.P("Запустить калибровку", id='calibration-button-text')
                     ], id='calibration-button'),
 
-                    dbc.Button('Остановить калибровку',
+                    dbc.Button(html.P('Остановить калибровку', id='calibration-button-stop-text'),
                                id='calibration-button-stop', disabled=True),
-                    dbc.Button('Запустить моделирование',
+                    dbc.Button(html.P('Запустить моделирование', id='forecast-button-text'),
                                id='forecast-button'),
-                    dbc.Button('Сохранить график', id='save_plot-button'),
-                    dbc.Button('Создать таблицу',
+                    dbc.Button(html.P('Сохранить график',id='save_plot-button-text'), id='save_plot-button'),
+                    dbc.Button(html.P('Создать таблицу', id='excel-button-text'),
                                id='excel-button', disabled=True),
                     # dbc.Button('Построить прогноз', id='forecast-button'),
                     #             dcc.Loading(
@@ -249,7 +249,7 @@ buttons = \
                 ], className='buttons-group')
             ], style={'marginTop': '20px', "height": "15%"})
         ])
-    ], style={'margin': "0"})
+    ], id='buttonRow')
 
 preset_components = html.Div([
     dcc.Upload(id="upload-preset",
@@ -375,7 +375,7 @@ layout = \
 '''
 
 advance_setting = html.Div([
-        dbc.Button('Advance setting', size="sm", className='advance_setting', id='advance_setting', style={'position': 'relative', 'left': '35%', 'top': '20px'}),
+        dbc.Button('Advance setting', size="sm", className='advance_setting', id='advance_setting', style={'position': 'relative', 'left': '35%', 'top': '20px', "marginBottom": "20px"}),
         
         dbc.Offcanvas(
             [

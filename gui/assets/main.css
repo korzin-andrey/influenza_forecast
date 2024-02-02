@@ -2,6 +2,17 @@
     height: 600px;
 }
 
+#buttonRow{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#calibration-button-stop-text, #forecast-button-text, #save_plot-button-text, #excel-button-text, #calibration-button-text{
+    margin:0;
+}
+
+
 #detail{
     margin: 20px 0px 10px 0px;
     text-align: center;
@@ -31,12 +42,8 @@ body {
 }
 
 
-@media (max-width:1400px) {
+@media (max-width:1622px) {
   /* your conditional / responsive CSS inside this condition */
-    body {
-        height: 765px;
-        padding-top: 0px
-    }
     #yearCol{
         margin-top: 10px;
     }
@@ -47,6 +54,7 @@ body {
     }
 
     #yearT{
+        margin: 20px 0px 10px 0px;
         position: relative;
         bottom: 10px;
         text-align: center;
@@ -64,5 +72,79 @@ body {
         display: block;
         margin-left: auto;
         margin-right: auto;
+    }
 }
+
+@media (max-width:1400px) {
+    body {
+        height: 765px;
+        padding-top: 0px
+    }
+
+    #yearT{
+        position: relative;
+        bottom: 10px;
+        text-align: center;
+    }
+
+}
+
+@media (max-width:1220px) {
+  /* your conditional / responsive CSS inside this condition */
+    body {
+        height: 900px;
+        padding-top: 0px
+    }
+
+    #detail{
+        margin: 7px 0px 5px 0px;
+        text-align: center;
+    }
+
+    #yearT{
+        margin: 20px 0px 5px 0px;
+        text-align: center;
+    }
+
+    #geoCol{
+    padding: 0;
+    }
+
+    #calibration-button-stop-text, #forecast-button-text, #save_plot-button-text, #excel-button-text, #calibration-button-text{
+        margin:0;
+        font-size: 12px;
+    }
+}
+
+@media (max-width:991) {
+  /* your conditional / responsive CSS inside this condition */
+    body {
+        height: 900px;
+        padding-top: 0px
+    }
+
+    #detail{
+        text-align: center;
+    }
+
+}
+
+@media (max-width: 813px) {
+  /* your conditional / responsive CSS inside this condition */
+    body {
+        height: 765px;
+        padding-top: 0px
+    }
+
+    #detail{
+        margin: 7px 0px 5px 0px;
+        text-align: center;
+    }
+
+    #yearT{
+        position: relative;
+        bottom: 10px;
+        text-align: center;
+    }
+
 }
