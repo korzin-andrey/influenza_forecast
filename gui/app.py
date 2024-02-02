@@ -54,7 +54,8 @@ app = DashProxy(__name__,
                 transforms=[CycleBreakerTransform()],
                 external_stylesheets=[dbc.themes.MATERIA],
                 prevent_initial_callbacks="initial_duplicate",
-                long_callback_manager=long_callback_manager)
+                long_callback_manager=long_callback_manager,
+                meta_tags=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1'}])
 app._favicon = ("favicon.ico")
 app.layout = layout
 PRESET_MODE = False
@@ -337,14 +338,17 @@ def update_graph(_, incidence, exposed_values,
     _GENERATE = toExcel(incidence, exposed_values,
                         lambda_values, labels, Data, Predict)
 
-    model_y = {"total": 0.845, "strain_age-group": 0.13,
+    model_y = {"total": 0.8, "strain_age-group": 0.13,
                "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
 
+    y0_rect = y0_rect + 1400
+
+    #######yticks_index = (y0_rect//(len(str(y0_rect))-1)) #4    
     fig.update_layout(
         template='none',
         autosize=False,
-        height=700,
+        height=600,
         margin={'l': 85, 'r': 40, 'b': 65, 't': 60, 'pad': 0},
         title={
             'text': f"Российская Федерация, {year}-{year + 1} гг.",
@@ -383,8 +387,6 @@ def update_graph(_, incidence, exposed_values,
             "borderwidth": 2
         }
     )
-
-    y0_rect = y0_rect + 1400
 
     fig.add_trace(go.Scatter(x=[pos_x]*int(y0_rect*1.03), y=[i for i in range(int(y0_rect*1.05))],
                              line=dict(color='rgba(0, 128, 0, 0.6)',
@@ -618,20 +620,20 @@ def update_graph_predict(_, incidence, exposed_values,
                            xanchor='left',
                            xref='paper',
                            x=0.03,
-                           yshift=i * (-25) + 300,
+                           yshift=i * (-25) + 200,
                            font={'color': colors[i], 'size': 18,
                                  "family": "Courier New, monospace"},
                            bgcolor="rgb(255, 255, 255)",
                            opacity=0.8)
 
-    model_y = {"total": 0.845, "strain_age-group": 0.125,
+    model_y = {"total": 0.8, "strain_age-group": 0.125,
                "strain": 0.73, "age-group": 0.785}
     data_y = {"total": 1, "strain_age-group": 1, "strain": 1, "age-group": 1}
 
     fig.update_layout(
         template='none',
         autosize=False,
-        height=700,
+        height=600,
         margin={'l': 85, 'r': 40, 'b': 65, 't': 60, 'pad': 0},
         title={
             'text': f"Российская Федерация, {year}-{year + 1} гг.",
@@ -871,7 +873,8 @@ def bulletin_client_call(_, incidence, exposed_values,
                Output('city', 'value', allow_duplicate=True),
                Output('year', 'value', allow_duplicate=True),
                Output('params-components', 'children'),
-               Output('params-components-advance', 'children')],
+               Output('params-components-advance', 'children'),
+               Output('upload-preset', 'contents')],
               Input('upload-preset', 'contents'),
               State('upload-preset', 'filename'),
               State('upload-preset', 'last_modified'),
@@ -923,7 +926,7 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
             city_default, 
             year_default,
             get_model_params_components(component_bunch, a_default, mu_default).children,
-            get_model_advance_params(delta_default).children)
+            get_model_advance_params(delta_default).children, None)
 
 
 def parse_contents(contents):

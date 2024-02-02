@@ -1,6 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 from dash_bootstrap_components import Row, Col
+import plotly.graph_objects as go
 
 from components import total_c
 
@@ -9,8 +10,8 @@ mode_bar_buttons_to_remove = ['autoScale2d',
 config = dict(displaylogo=False, responsive=True,
               modeBarButtonsToRemove=mode_bar_buttons_to_remove)
 
-cities = [html.P('Город', style={'margin': '20px 20px'}),
-          dcc.RadioItems(options=[{'label': 'Санкт-Петербург', 'value': 'spb'},
+cities = [html.P('География', style={'margin': '20px 20px'}),
+          dcc.RadioItems(options=[{'label': 'Россия', 'value': 'spb'},
                                   #   {'label': 'Москва', 'value': 'msc',
                                   #       'disabled': True},
                                   #   {'label': 'Новосибирск', 'value': 'novosib', 'disabled': True}
@@ -18,10 +19,10 @@ cities = [html.P('Город', style={'margin': '20px 20px'}),
                          value='spb',
                          inputStyle={"marginRight": "10px",
                                      "marginLeft": "15px"},
-                         style={'margin': '10px 5px'},
+                         style={'margin': '10px 0px'},
                          id='city')]
 
-years = [html.P('Год', style={'margin': '20px 0px 10px 0px'}),
+years = [html.P('Год', id='yearT'),
          dcc.Dropdown(options=['2010', '2011', '2012', '2013', '2014',
                                '2015', '2016', '2017', '2018', '2019',
                                '2020', '2021', '2022', '2023'],
@@ -31,7 +32,7 @@ years = [html.P('Год', style={'margin': '20px 0px 10px 0px'}),
 
 
 def get_incidence_type(default):
-    return [html.P('Уровень детализированности', style={'margin': '20px 0px 10px 0px'}),
+    return [html.P('Уровень детализированности', id='detail'),
             dcc.Dropdown(options=[
                 # {'label': 'возрастные группы', 'value': 'age-group'},
                 #   {'label': 'штаммы', 'value': 'strain'},
@@ -53,8 +54,8 @@ def get_data_components(incidence_type_init):
 def get_data_components(incidence_type_init):
     return Row([
         Col([*cities], md=3),
-        Col([*years], md=4),
-        Col([*get_incidence_type(incidence_type_init)], md=4)
+        Col([*years], md=4, id='yearCol'),
+        Col([*get_incidence_type(incidence_type_init)], md=5)
     ], id='data_components', justify='left')
 
 data_components = get_data_components('total')
@@ -246,9 +247,9 @@ buttons = \
                     #     dbc.Button('Генерация бюллетеня', id='ci-button'),
                     #     dcc.Download(id="download-ci-request-json")],)
                 ], className='buttons-group')
-            ], style={'margin': '20px 60px 0px 0px', "height": "15%"})
+            ], style={'marginTop': '20px', "height": "15%"})
         ])
-    ], justify='center')
+    ], style={'margin': "0"})
 
 preset_components = html.Div([
     dcc.Upload(id="upload-preset",
@@ -273,7 +274,7 @@ preset_components = html.Div([
 source_components = html.Div([
     dcc.Upload(id="upload-source",
                children=html.Div(["Загрузите данные или ",
-                                  html.A("выберите файл"),
+                                  html.A("выберите файл", href=""),
                                   " в формате excel"]),
                style={
                    'width': '100%',
@@ -374,7 +375,7 @@ layout = \
 '''
 
 advance_setting = html.Div([
-        dbc.Button('Advance setting', size="sm", id='advance_setting', style={'position': 'relative', 'left': '40%'}),
+        dbc.Button('Advance setting', size="sm", className='advance_setting', id='advance_setting', style={'position': 'relative', 'left': '35%', 'top': '20px'}),
         
         dbc.Offcanvas(
             [
@@ -398,28 +399,37 @@ upper_row = \
                             id='documentation'),
                 ], style={'fontWeight': 'bold'}),
             ],
-                style={'padding': '30px 40px 30px 40px',
+                style={'padding': '0px 40px 30px 40px',
                        'backgroundColor': 'white'})
-
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=[2],
+    y=[1],
+    text=["Запустите моделирование, чтобы построить график"],
+    mode="text",
+))
 lower_row = \
     dbc.Spinner([
             html.Div([
-                dcc.Graph(id='model-fit', config=config, mathjax=True)
+                dcc.Graph(id='model-fit', className='dash-graph-districts', config=config, mathjax=True)
             ], className='graph-container rounded',
                 style={'backgroundColor': 'white',
                        'padding': '20px 20px',
                         'border': 'solid black 1px',
-                        'marginRight': '5px'})
+                        'marginRight': '10px',
+                        'marginLeft': '10px'})
         ], size='lg', color="primary", type="border", fullscreen=True, )
 
-new_r = Row([ Col(upper_row, width=5), Col([Row(lower_row), Row(buttons)], width=7) ])
+new_r = Row([ 
+    Col(upper_row, lg=5, width=12), Col([Row(lower_row), Row(buttons)], lg=7, width=12) 
+    ], justify='center')
 
 layout = \
     html.Div([
         new_r, 
     ], style={'backgroundColor': 'white',
               'width': '100%', 'height': '100%',
-              'margin': '0px', 'padding': '20px 0px'})
+              'margin': '0px', 'paddingTop': '20px'})
 
 
 
