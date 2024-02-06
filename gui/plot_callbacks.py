@@ -8,6 +8,7 @@ from toTable.toExcel import toExcel
 from bootstrapping.predict_gates import PredictGatesGenerator
 from aux_functions import prepare_exposed_list, get_data_and_model, transform_days_to_weeks, generate_xticks
 
+_GENERATE = None
 
 def update_graph(_, incidence, exposed_values,
                  lambda_values, a, mu, delta, sample_size, city, year):
@@ -109,7 +110,7 @@ def update_graph(_, incidence, exposed_values,
         template='none',
         autosize=False,
         height=600,
-        margin={'l': 100, 'r': 0, 'b': 65, 't': 60, 'pad': 0},
+        margin={'l': 100, 'r': 20, 'b': 65, 't': 60, 'pad': 0},
         title={
             'text': f"Российская Федерация, {year}-{year + 1} гг.",
             'font': {'size': 40},
@@ -397,7 +398,7 @@ def update_graph_predict(_, incidence, exposed_values,
         template='none',
         autosize=False,
         height=600,
-        margin={'l': 100, 'r': 0, 'b': 65, 't': 60, 'pad': 0},
+        margin={'l': 100, 'r': 20, 'b': 65, 't': 60, 'pad': 0},
         title={
             'text': f"Российская Федерация, {year}-{year + 1} гг.",
             'font': {'size': 40},

@@ -1,5 +1,5 @@
 from app import app
-from dash import Input, Output, callback, ALL, ctx
+from dash import Input, Output, State, callback, ALL, ctx
 from components import multi_strain, multi_age, multi_strain_age, total_c
 from dash.exceptions import PreventUpdate
 
@@ -86,7 +86,6 @@ def update_lambda(lambda_io, lambda_):
 
 
 
-
 @app.callback(
     [Output('a', 'value'),
      Output('a_io', 'value'),
@@ -101,7 +100,7 @@ def update_lambda(lambda_io, lambda_):
 def update_a(a_io, a):
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-    if "_o" in trigger_id:
+    if "_io" in trigger_id:
         a = a_io
     else:
         a_io = a
@@ -109,6 +108,7 @@ def update_a(a_io, a):
     min_ = round(a-0.0005,5)
     max_ = round(a+0.0005,5)
     marks = {min_: f'{min_}', max_: f'{max_}'}
+    print(marks)
     return a_io, a, min_, max_, marks
 
 
@@ -221,3 +221,16 @@ def update_inflation_parameter(inflation_parameter_io, inflation_parameter):
         inflation_parameter_io = inflation_parameter
 
     return inflation_parameter_io, inflation_parameter
+
+
+
+
+@app.callback(
+    Output("offcanvas", "is_open"),
+    Input("advance_setting", "n_clicks"),
+    [State("offcanvas", "is_open")],
+)
+def toggle_offcanvas(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
