@@ -407,11 +407,16 @@ fig.add_trace(go.Scatter(
     y=[1],
     text=["Запустите моделирование, чтобы построить график"],
     mode="text",
+    textfont=dict(
+        family="Verdana",
+        size=22,
+        color="#808080"
+    )
 ))
 lower_row = \
     dbc.Spinner([
             html.Div([
-                dcc.Graph(id='model-fit', className='dash-graph-districts', config=config, mathjax=True)
+                dcc.Graph(figure=fig, id='model-fit', className='dash-graph-districts', config=config, mathjax=True)
             ], className='graph-container rounded',
                 style={'backgroundColor': 'white',
                        'padding': '20px 20px',
