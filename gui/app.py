@@ -62,6 +62,7 @@ _GENERATE = None
 
 # UPDATING COMPONENTS
 
+
 @app.callback(
     [Output('exposed-accordion-item', 'children', allow_duplicate=True),
      Output('lambda-accordion-item', 'children', allow_duplicate=True)],
@@ -106,10 +107,12 @@ def update_exposed(exposed_io, exposed):
     else:
         exposed_io = exposed
 
-    min_ = [round(i-0.0005,4) for i in exposed]
-    max_ = [round(i+0.0005,4) for i in exposed]
-    marks = [{min_[i]: f'{min_[i]}', max_[i]: f'{max_[i]}'} for i in range(len(min_))]
+    min_ = [round(i-0.0005, 4) for i in exposed]
+    max_ = [round(i+0.0005, 4) for i in exposed]
+    marks = [{min_[i]: f'{min_[i]}', max_[i]: f'{max_[i]}'}
+             for i in range(len(min_))]
     return exposed, exposed_io, min_, max_, marks
+
 
 @app.callback(
     [Output({'type': 'lambda', 'index': ALL}, 'value'),
@@ -130,10 +133,12 @@ def update_lambda(lambda_io, lambda_):
     else:
         lambda_io = lambda_
 
-    min_ = [round(i-0.00005,5) for i in lambda_]
-    max_ = [round(i+0.00005,5) for i in lambda_]
-    marks = [{min_[i]: f'{min_[i]}', max_[i]: f'{max_[i]}'} for i in range(len(min_))]
+    min_ = [round(i-0.00005, 5) for i in lambda_]
+    max_ = [round(i+0.00005, 5) for i in lambda_]
+    marks = [{min_[i]: f'{min_[i]}', max_[i]: f'{max_[i]}'}
+             for i in range(len(min_))]
     return lambda_, lambda_io, min_, max_, marks
+
 
 @app.callback(
     [Output('a', 'value'),
@@ -154,11 +159,12 @@ def update_a(a_io, a):
     else:
         a_io = a
 
-    min_ = round(a-0.0005,5)
-    max_ = round(a+0.0005,5)
+    min_ = round(a-0.0005, 5)
+    max_ = round(a+0.0005, 5)
     print(min_, max_)
     marks = {min_: f'{min_}', max_: f'{max_}'}
     return a_io, a, min_, max_, marks
+
 
 @app.callback(
     [Output('mu', 'value'),
@@ -179,11 +185,12 @@ def update_mu(mu_io, mu):
     else:
         mu_io = mu
 
-    min_ = round(mu-0.0005,5)
-    max_ = round(mu+0.0005,5)
+    min_ = round(mu-0.0005, 5)
+    max_ = round(mu+0.0005, 5)
     print(min_, max_)
     marks = {min_: f'{min_}', max_: f'{max_}'}
     return mu_io, mu, min_, max_, marks
+
 
 @app.callback(
     [Output('delta', 'value'),
@@ -222,6 +229,7 @@ def update_inputs(delta, sample, forecast_term, inflation_parameter):
     """
     return [delta, sample, forecast_term, inflation_parameter]
 
+
 @app.callback(
     Output("offcanvas", "is_open"),
     Input("advance_setting", "n_clicks"),
@@ -248,6 +256,8 @@ def toggle_offcanvas(n1, is_open):
 #     State('year', 'value'),
 #     prevent_initial_call=False
 # )
+
+
 def update_graph(_, incidence, exposed_values,
                  lambda_values, a, mu, delta, sample_size, city, year):
     """
@@ -879,7 +889,7 @@ def bulletin_client_call(_, incidence, exposed_values,
               )
 def process_preset(list_of_contents, list_of_names, list_of_dates):
     incidence_default = "total"
-    city_default = 'spb'
+    city_default = 'rus'
     year_default = '2023'
 
     component_bunch = age_groups_comps.get_multi_age_c()
@@ -920,9 +930,10 @@ def process_preset(list_of_contents, list_of_names, list_of_dates):
             raise ValueError(f"can't parse incidence: {incidence_default}")
 
     return (get_data_components(incidence_default).children,
-            city_default, 
+            city_default,
             year_default,
-            get_model_params_components(component_bunch, a_default, mu_default).children,
+            get_model_params_components(
+                component_bunch, a_default, mu_default).children,
             get_model_advance_params(delta_default).children)
 
 

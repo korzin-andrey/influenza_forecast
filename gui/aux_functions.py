@@ -163,6 +163,7 @@ def lambda_dict_to_inputs(lambda_dict, incidence):
         raise ValueError(f"can't parse incidence: {incidence}")
 
 
-cities = {'spb': 'Санкт-Петербург',
+cities = {'rus': 'Российская Федерация',
+          'spb': 'Санкт-Петербург',
           'msc': 'Москва',
           'novosib': 'Новосибирск'}

@@ -9,17 +9,19 @@ mode_bar_buttons_to_remove = ['autoScale2d',
 config = dict(displaylogo=False, responsive=True,
               modeBarButtonsToRemove=mode_bar_buttons_to_remove)
 
-cities = [html.P('Город', style={'margin': '20px 20px'}),
-          dcc.RadioItems(options=[{'label': 'Санкт-Петербург', 'value': 'spb'},
-                                  #   {'label': 'Москва', 'value': 'msc',
-                                  #       'disabled': True},
-                                  #   {'label': 'Новосибирск', 'value': 'novosib', 'disabled': True}
-                                  ],
-                         value='spb',
-                         inputStyle={"marginRight": "10px",
-                                     "marginLeft": "15px"},
-                         style={'margin': '10px 5px'},
-                         id='city')]
+cities = [html.P('География', style={'margin': '20px 20px'}),
+          dcc.RadioItems(options=[
+              #   {'label': 'Санкт-Петербург', 'value': 'spb'},
+              {'label': 'Россия', 'value': 'rus'},
+              #   {'label': 'Москва', 'value': 'msc',
+              #       'disabled': True},
+              #   {'label': 'Новосибирск', 'value': 'novosib', 'disabled': True}
+          ],
+    value='spb',
+    inputStyle={"marginRight": "10px",
+                "marginLeft": "15px"},
+    style={'margin': '10px 5px'},
+    id='city')]
 
 years = [html.P('Год', style={'margin': '20px 0px 10px 0px'}),
          dcc.Dropdown(options=['2010', '2011', '2012', '2013', '2014',
@@ -40,6 +42,7 @@ def get_incidence_type(default):
                 {'label': 'агрегированные данные', 'value': 'total'}],
         value=default, id='incidence', clearable=False)]
 
+
 '''
         ***OLD INTERFACE VERSION***
 def get_data_components(incidence_type_init):
@@ -50,12 +53,14 @@ def get_data_components(incidence_type_init):
     ], id='data_components', justify='left')
 '''
 
+
 def get_data_components(incidence_type_init):
     return Row([
         Col([*cities], md=3),
         Col([*years], md=4),
         Col([*get_incidence_type(incidence_type_init)], md=4)
     ], id='data_components', justify='left')
+
 
 data_components = get_data_components('total')
 
@@ -80,7 +85,7 @@ def get_mu_layout(value):
     _max = round(value+0.0005, 4)
     return Row([
         Col([
-            dcc.Slider(min=_min, max=_max, step=0.0001, marks={_min: f'{_min}', _max: f'{_max}'}, 
+            dcc.Slider(min=_min, max=_max, step=0.0001, marks={_min: f'{_min}', _max: f'{_max}'},
                        id='mu', tooltip={"placement": "bottom"}, value=value)
         ]),
         Col([
@@ -170,47 +175,54 @@ def get_model_params_components(components_inc, a_default=0.01093982936993367, m
     ])
 '''
 
+
 def get_model_params_components(components_inc, a_default=0.01093982936993367, mu_default=0.2):
     return dbc.ListGroup([
 
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Доля переболевших'), style={'margin': '5px 0px 15px 0px'}), 
-                                    Row(components_inc['exposed'], id='exposed-accordion-item')
-                                    ],style={'margin': '20px 0px 0px 0px'}),
+        dbc.ListGroupItem([
+            Row(html.H6('Доля переболевших'), style={
+                'margin': '5px 0px 15px 0px'}),
+            Row(components_inc['exposed'], id='exposed-accordion-item')
+        ], style={'margin': '20px 0px 0px 0px'}),
 
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Вирулентность'), style={'margin': '5px 0px 15px 0px'}), 
-                                    Row(components_inc['lambda'], id='lambda-accordion-item')
-                                    ]),
+        dbc.ListGroupItem([
+            Row(html.H6('Вирулентность'), style={
+                'margin': '5px 0px 15px 0px'}),
+            Row(components_inc['lambda'], id='lambda-accordion-item')
+        ]),
 
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Доля населения, теряющего иммунитет за год'), style={'margin': '5px 0px 15px 0px'}), 
-                                    Row(get_a_layout(a_default))
-                                    ]),
+        dbc.ListGroupItem([
+            Row(html.H6('Доля населения, теряющего иммунитет за год'),
+                style={'margin': '5px 0px 15px 0px'}),
+            Row(get_a_layout(a_default))
+        ]),
 
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Доля населения, потерявшего иммунитет'), style={'margin': '5px 0px 15px 0px'}), 
-                                    Row(get_mu_layout(mu_default))
-                                    ]),
-            ], id='params-components')
+        dbc.ListGroupItem([
+            Row(html.H6('Доля населения, потерявшего иммунитет'),
+                style={'margin': '5px 0px 15px 0px'}),
+            Row(get_mu_layout(mu_default))
+        ]),
+    ], id='params-components')
+
 
 def get_model_advance_params(delta_default=30):
     return dbc.ListGroup([
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Сдвиг данных')), 
-                                    Row(get_delta_layout(delta_default))
-                                    ]),
+        dbc.ListGroupItem([
+            Row(html.H6('Сдвиг данных')),
+            Row(get_delta_layout(delta_default))
+        ]),
 
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Доступность данных')), 
-                                    Row(sample)
-                                    ]),
+        dbc.ListGroupItem([
+            Row(html.H6('Доступность данных')),
+            Row(sample)
+        ]),
 
-                 dbc.ListGroupItem([
-                                    Row(html.H6('Прогнозирование')), 
-                                    Row(forecasting)
-                                    ])
-            ], id='params-components-advance')
+        dbc.ListGroupItem([
+            Row(html.H6('Прогнозирование')),
+            Row(forecasting)
+        ])
+    ], id='params-components-advance')
+
 
 model_components = get_model_params_components(total_c)
 
@@ -374,52 +386,51 @@ layout = \
 '''
 
 advance_setting = html.Div([
-        dbc.Button('Advance setting', size="sm", id='advance_setting', style={'position': 'relative', 'left': '40%'}),
-        
-        dbc.Offcanvas(
-            [
-                get_model_advance_params()
-            ],
-            id="offcanvas",
-            title="Advance setting",
-            is_open=False,
-            style={'width': '40%'}
-        ),
-    ])
+    dbc.Button('Advance setting', size="sm", id='advance_setting',
+               style={'position': 'relative', 'left': '40%'}),
+
+    dbc.Offcanvas(
+        [
+            get_model_advance_params()
+        ],
+        id="offcanvas",
+        title="Advance setting",
+        is_open=False,
+        style={'width': '40%'}
+    ),
+])
 
 upper_row = \
-            html.Div([
-                dbc.Tabs([
-                    dbc.Tab([model_components, data_components, advance_setting],
-                            label='Параметры модели', id='model-components'),
-                    dbc.Tab([preset_components, source_components], label='Пресеты',
-                            id='preset-components'),
-                    dbc.Tab([documentation], label='Инструкция',
-                            id='documentation'),
-                ], style={'fontWeight': 'bold'}),
-            ],
-                style={'padding': '30px 40px 30px 40px',
-                       'backgroundColor': 'white'})
+    html.Div([
+        dbc.Tabs([
+            dbc.Tab([model_components, data_components, advance_setting],
+                    label='Параметры модели', id='model-components'),
+            dbc.Tab([preset_components, source_components], label='Пресеты',
+                    id='preset-components'),
+            dbc.Tab([documentation], label='Инструкция',
+                    id='documentation'),
+        ], style={'fontWeight': 'bold'}),
+    ],
+        style={'padding': '30px 40px 30px 40px',
+               'backgroundColor': 'white'})
 
 lower_row = \
     dbc.Spinner([
-            html.Div([
+        html.Div([
                 dcc.Graph(id='model-fit', config=config, mathjax=True)
-            ], className='graph-container rounded',
-                style={'backgroundColor': 'white',
-                       'padding': '20px 20px',
-                        'border': 'solid black 1px',
-                        'marginRight': '5px'})
-        ], size='lg', color="primary", type="border", fullscreen=True, )
+                ], className='graph-container rounded',
+            style={'backgroundColor': 'white',
+                   'padding': '20px 20px',
+                   'border': 'solid black 1px',
+                   'marginRight': '5px'})
+    ], size='lg', color="primary", type="border", fullscreen=True, )
 
-new_r = Row([ Col(upper_row, width=5), Col([Row(lower_row), Row(buttons)], width=7) ])
+new_r = Row([Col(upper_row, width=5), Col(
+    [Row(lower_row), Row(buttons)], width=7)])
 
 layout = \
     html.Div([
-        new_r, 
+        new_r,
     ], style={'backgroundColor': 'white',
               'width': '100%', 'height': '100%',
               'margin': '0px', 'padding': '20px 0px'})
-
-
-
