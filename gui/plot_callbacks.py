@@ -7,8 +7,10 @@ import plotly.graph_objects as go
 from toTable.toExcel import toExcel
 from bootstrapping.predict_gates import PredictGatesGenerator
 from aux_functions import prepare_exposed_list, get_data_and_model, transform_days_to_weeks, generate_xticks
+import pandas as pd
 
 _GENERATE = None
+
 
 def update_graph(_, incidence, exposed_values,
                  lambda_values, a, mu, delta, sample_size, city, year):
@@ -32,7 +34,7 @@ def update_graph(_, incidence, exposed_values,
 
     epid_data.index = epid_data.reset_index().index + delta
     m, n = epid_data.index[0], epid_data.index[-1]
-    last_simul_ind = n + 5
+    last_simul_ind = n + 6
 
     xticks_vals, xticks_text = generate_xticks(epid_data, year, last_simul_ind)
     pos_x = xticks_vals[xticks_vals['year'] == year].index[-1]
@@ -105,7 +107,7 @@ def update_graph(_, incidence, exposed_values,
 
     y0_rect = y0_rect + 1400
 
-    #######yticks_index = (y0_rect//(len(str(y0_rect))-1)) #4    
+    # yticks_index = (y0_rect//(len(str(y0_rect))-1)) #4
     fig.update_layout(
         template='none',
         autosize=False,
@@ -119,7 +121,7 @@ def update_graph(_, incidence, exposed_values,
         },
 
         yaxis={'tickfont': {'size': 18}},
-        yaxis_tickformat = '0',
+        yaxis_tickformat='0',
         xaxis={'tickvals': xticks_vals.index, 'ticktext': xticks_text, 'tickangle': 0,
                'tickfont': {'size': 20}, 'showgrid': True},
         legend={
@@ -182,12 +184,10 @@ def update_graph(_, incidence, exposed_values,
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
     # ось у
-    fig.update_yaxes(title_text="Количество случаев заболевания, в тыс.", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
     return fig, False
-
-
 
 
 @app.callback(
@@ -228,9 +228,18 @@ def update_graph_predict(_, incidence, exposed_values,
 
     epid_data, model_obj, groups = get_data_and_model(mu, incidence, year)
     if sample_size >= len(epid_data.index):
+        print("Retrospective plot")
         return update_graph(_, incidence, exposed_values,
                             lambda_values, a, mu, delta, sample_size, city, year)
-
+    last_week_number = epid_data.loc[epid_data.index[-1], 'Неделя']
+    print(last_week_number)
+    for i in range(forecast_term):
+        last_week_number += 1
+        epid_data.loc[len(epid_data)] = 0
+        epid_data.loc[epid_data.index[-1], 'Неделя'] = last_week_number
+    print(epid_data.head(30))
+    print(len(epid_data.index))
+    print("Forecast plot")
     fig = go.Figure()
 
     model_obj.init_simul_params(
@@ -378,17 +387,17 @@ def update_graph_predict(_, incidence, exposed_values,
     _GENERATE = toExcel(incidence, exposed_values,
                         lambda_values, labels, Data, Predict)
 
-    for i, r2 in enumerate(r_squared):
-        fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
-                           showarrow=False,
-                           xanchor='left',
-                           xref='paper',
-                           x=0.03,
-                           yshift=i * (-25) + 200,
-                           font={'color': colors[i], 'size': 18,
-                                 "family": "Courier New, monospace"},
-                           bgcolor="rgb(255, 255, 255)",
-                           opacity=0.8)
+    # for i, r2 in enumerate(r_squared):
+    #     fig.add_annotation(text=f'<b>$R^2={str(round(r2, 2))}$</b>',
+    #                        showarrow=False,
+    #                        xanchor='left',
+    #                        xref='paper',
+    #                        x=0.03,
+    #                        yshift=i * (-25) + 200,
+    #                        font={'color': colors[i], 'size': 18,
+    #                              "family": "Courier New, monospace"},
+    #                        bgcolor="rgb(255, 255, 255)",
+    #                        opacity=0.8)
 
     model_y = {"total": 0.8, "strain_age-group": 0.125,
                "strain": 0.73, "age-group": 0.785}
@@ -407,7 +416,7 @@ def update_graph_predict(_, incidence, exposed_values,
         },
         font={'size': 13},
         yaxis={'tickfont': {'size': 18}},
-        yaxis_tickformat = '0',
+        yaxis_tickformat='0',
         xaxis={'tickvals': xticks_vals.index, 'ticktext': xticks_text, 'tickangle': 0,
                'tickfont': {'size': 20}, 'showgrid': True},
         legend={
@@ -535,6 +544,6 @@ def update_graph_predict(_, incidence, exposed_values,
     fig.update_xaxes(title_text="Номер недели в году", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
 
-    fig.update_yaxes(title_text="Количество случаев заболевания, в тыс.", title_font_size=25, showline=True, linewidth=2, linecolor='black',
+    fig.update_yaxes(title_text="Количество случаев заболевания", title_font_size=25, showline=True, linewidth=2, linecolor='black',
                      mirror=True, zeroline=False, griddash='dash', ticks="outside", tickwidth=1, gridcolor='rgb(202, 222, 255)')
     return fig, False

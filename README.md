@@ -11,7 +11,7 @@ Linux:
 2) ```source .env/bin/activate ```
 3) ```python -m pip install -e . ```
 4) ```export PYTHONPATH=.```
-5) ```python gui/app.py ```
+5) ```python gui/index.py ```
 ------------------------------------------------------------------
 Enjoy forecasting influenza outbreaks!
 
