@@ -227,7 +227,7 @@ def update_graph_predict(_, incidence, exposed_values,
     exposed_list = prepare_exposed_list(incidence, exposed_list)
 
     epid_data, model_obj, groups = get_data_and_model(mu, incidence, year)
-    if sample_size >= len(epid_data.index):
+    if sample_size > len(epid_data.index):
         print("Retrospective plot")
         return update_graph(_, incidence, exposed_values,
                             lambda_values, a, mu, delta, sample_size, city, year)
@@ -253,7 +253,6 @@ def update_graph_predict(_, incidence, exposed_values,
     last_simul_ind = n + 20
 
     ds_amount = int(100 / len(simul_weekly.columns))
-
     predict_gates_generator = PredictGatesGenerator(epid_data.loc[:, simul_weekly.columns],
                                                     simul_weekly.dropna(
                                                         axis=1),

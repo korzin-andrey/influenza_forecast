@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import html, dcc
 from dash_bootstrap_components import Row, Col
 import plotly.graph_objects as go
-
+from aux_functions import get_data_size
 from components import total_c
 
 mode_bar_buttons_to_remove = ['autoScale2d',
@@ -107,16 +107,16 @@ def get_delta_layout(value):
         ], align='end')
     ])
 
-
+data_size = get_data_size('total', 2010)
 sample = Row([
     html.P('Размер выборки'),
     Col([
         dcc.Slider(min=2, max=52, step=1, marks={2: '2', 52: '52'}, id='sample',
-                   tooltip={"placement": "bottom"}, value=52),
+                   tooltip={"placement": "bottom"}, value=data_size),
     ]),
     Col([
         dbc.Input(id='sample_io', type='number',
-                  value=52, style={'width': '170px'})
+                  value=data_size, style={'width': '170px'})
     ], align='end')
 ])
 
@@ -176,7 +176,7 @@ def get_model_params_components(components_inc, a_default=0.01093982936993367, m
 '''
 
 
-def get_model_params_components(components_inc, a_default=0.01093982936993367, mu_default=0.2):
+def get_model_params_components(components_inc, a_default=0.051179112067742026, mu_default=0.2):
     return dbc.ListGroup([
 
         dbc.ListGroupItem([
@@ -205,7 +205,7 @@ def get_model_params_components(components_inc, a_default=0.01093982936993367, m
     ], id='params-components')
 
 
-def get_model_advance_params(delta_default=30):
+def get_model_advance_params(delta_default=46):
     return dbc.ListGroup([
         dbc.ListGroupItem([
             Row(html.H6('Сдвиг данных')),

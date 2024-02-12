@@ -26,12 +26,16 @@ class TruncatedNegativeBinomial:
     def get_random_value_mv(self, mean, variance):
         p = mean / variance
         r = mean * p / (1.0 - p)
-
         restraint = np.arange(1 if self.ZERO_TRUNCATED else 0, math.ceil(mean + math.sqrt(variance) * 3))
         probabilities = stats.nbinom.pmf(restraint, r, p)
         probabilities /= probabilities.sum()
-        return np.random.choice(restraint, p=probabilities)
 
+        return np.random.choice(restraint, p=probabilities)
+#2618.7241532284197 589022.4538411608
+#0.004445881708160824 11.694530309947703
+
+#14.573704754068011 0.687215334129598
+#21.20689692194738 -15.294929037557033
 
 class NegativeBinomialErrorStructure:
     def __init__(self, original_data: pd.DataFrame):
@@ -59,7 +63,6 @@ class NegativeBinomialErrorStructure:
                     current_variance = ((simulated_incidence.iloc[self.outbreak_begin:self.outbreak_begin + i_week, :] -
                                          self.original_data[simulated_incidence.columns[:]]).std() ** 2)[column]
                     current_variance *= inflation_parameter
-
                 simulated_incidence.loc[i_week, column] = self.distribution.get_random_value_mv(current_mean,
                                                                                                 current_variance)
 

@@ -38,6 +38,19 @@ def get_data_and_model(mu, incidence, exposure_year):
 
     return epid_data, model, groups
 
+def get_data_size(incidence, year):
+    config = get_config('config.yaml')
+
+    path = config['data_path']
+    contact_matrix_path = config['contact_matrix_path']
+
+    age_groups = config['age_groups']
+    strains = config['strains']
+
+    epid_data, pop_size = prepare_calibration_data(path, incidence,
+                                                   age_groups, strains, year)
+
+    return len(epid_data)
 
 def prepare_exposed_list(incidence, exposed_list):
     if incidence == 'age-group':
@@ -115,7 +128,7 @@ def generate_xticks(epid_data, year, last_simul_ind):
         else:
             first_week_num = 52
 
-    xticks_text = [val if (val % 5 == 0) or (
+    xticks_text = [val if (val % 5 == 0 and val!=0) or (
         val == 1) else '' for val in xticks_vals['week'].tolist()]
     return xticks_vals, xticks_text
 

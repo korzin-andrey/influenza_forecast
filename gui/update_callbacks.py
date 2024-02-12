@@ -2,8 +2,18 @@ from app import app
 from dash import Input, Output, State, callback, ALL, ctx
 from components import multi_strain, multi_age, multi_strain_age, total_c
 from dash.exceptions import PreventUpdate
-
+from aux_functions import get_data_size
 UPDATE_MODE = True
+
+
+@app.callback(
+    Output('sample', 'value', allow_duplicate=True),
+    Input('year', 'value'),
+    State('incidence', 'value'),
+    prevent_initial_call=True
+)
+def update_year(year, incidence):
+    return get_data_size(incidence, int(year))
 
 @app.callback(
     [Output('exposed-accordion-item', 'children', allow_duplicate=True),
@@ -108,7 +118,6 @@ def update_a(a_io, a):
     min_ = round(a-0.0005,5)
     max_ = round(a+0.0005,5)
     marks = {min_: f'{min_}', max_: f'{max_}'}
-    print(marks)
     return a_io, a, min_, max_, marks
 
 
