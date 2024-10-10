@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "influenza-forecast"
+
+version = "1.0.0"
+
+description = "A project represents a framework for influenza modeling using Baroyan-Rvachev model with simulated annealing and L-BFGS-B optimization techniques. Uncertainty quantification is also enabled."
+
+authors = ["..."]
+
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
